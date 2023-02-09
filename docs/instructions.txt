@@ -1,0 +1,17 @@
+First
+    Create a virtual enviroment
+
+        virtualen name-enviroment
+    
+    Activate yhe virtual enviroment
+
+        .\name-enviroment\Script\activate
+    
+Second
+
+    Install librarys 
+
+        pip install flask python-decouple pyodbc python-dotenv Flask-Cors pytest Flask-PyMongo 
+        
+
+    
