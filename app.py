@@ -958,6 +958,5 @@ def index():
 
 
 if __name__ == '__main__':
-    main.config.from_object(config['development'])
     main.register_error_handler(404, Page_Not_Found)
-    main.run()
+    main.run(debug = True, host = "0.0.0.0")
