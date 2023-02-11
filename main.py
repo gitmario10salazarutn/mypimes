@@ -4,13 +4,14 @@ Created on Tue Oct 11 22:55:25 2022
 
 @author: Mario
 """
-
+from flask_cors import CORS
 from flask import jsonify, request
 from flask import Flask, jsonify, request
 from config import config
 from models import Models as model
 
 main = Flask(__name__)
+CORS(main)
 
 @main.route('/get_user_byid/<id_user>', methods=['GET'])
 def get_user_byid(id_user):
