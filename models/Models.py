@@ -1346,3 +1346,32 @@ class Model:
                     return {'message': 'Error, Delete Aliquot failed, User rol not found!'}
         except Exception as ex:
             raise Exception(ex)
+
+    @classmethod
+    def get_detalle_reservaciones(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select*from get_detalle_reservaciones gdr")
+            result = cursor.fetchall()
+            connection.close()
+            a = entities.Entities.listDetalleReservaciones(result)
+            return a
+        except Exception as ex:
+            raise Exception(ex)
+
+
+    @classmethod
+    def get_detalle_reservaciones_byid(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select*from get_detalle_reservaciones a where a.resv_idreservacion= {0};".format(id))
+            result = cursor.fetchone()
+            connection.close()
+            a = [entities.Entities.alicuota_actualizadaEntity(result)]
+            return a
+        except Exception as ex:
+            raise Exception(ex)

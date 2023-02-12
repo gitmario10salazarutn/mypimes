@@ -944,6 +944,29 @@ def delete_alicuotaActualizada(id_ac):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
+@main.route('/get_detalle_reservaciones', methods=['GET'])
+def get_detalle_reservaciones():
+    try:
+        a = model.Model.get_detalle_reservaciones()
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/get_detalle_reservaciones_byid/<id_areservacion>', methods=['GET'])
+def get_detalle_reservaciones_byid(id_areservacion):
+    try:
+        ac_id = model.Model.get_detalle_reservaciones_byid(id_areservacion)
+        if ac_id is None:
+            return jsonify({'message': 'updated reservation detail not found!'}), 404
+        else:
+            return ac_id
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
 
 def Page_Not_Found(error):
     return '<h1>Page Not Found</h1>', 404
