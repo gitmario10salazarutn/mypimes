@@ -571,6 +571,7 @@ class Model:
                 "select doc.doc_iddocumento, doc.tipdoc_id,doc.sec_idsecretario,doc.doc_descripcion,doc.doc_documento,doc.doc_entidad,doc.doc_recibido from documentos doc")
             result = cursor.fetchall()
             connection.close()
+            print(result)
             documentoss = entities.Entities.listDocumentos(result)
             return documentoss
         except Exception as ex:
@@ -733,7 +734,7 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select r.reun_idreunion, r.pres_idpresidente,r.mult_idmulta,r.reun_fecha,r.reun_hora,r.reun_descripcion,r.reun_quorum,r.reun_estado,r.secretario from reunion r")
+                "select * from get_reuniones r")
             result = cursor.fetchall()
             connection.close()
             reuniones = entities.Entities.listReunion(result)
@@ -747,7 +748,7 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select r.reun_idreunion, r.pres_idpresidente,r.mult_idmulta,r.reun_fecha,r.reun_hora,r.reun_descripcion,r.reun_quorum,r.reun_estado,r.secretario from reunion r where r.reun_idreunion={0};".format(id))
+                "select * from get_reuniones r where r.reun_idreunion={0};".format(id))
             result = cursor.fetchone()
             connection.close()
             td = [entities.Entities.reunionEntity(result)]
@@ -819,9 +820,10 @@ class Model:
                 cursor = connection.cursor()
                 cursor.execute(
                     "select m.mult_idmulta, m.mult_nombre, m.mult_valor from multa m")
-                result = cursor.fetchone()
+                result = cursor.fetchall()
                 connection.close()
-                return result
+                m = entities.Entities.listMultas(result)
+                return m
             except Exception as ex:
                 raise Exception(ex)
 
@@ -835,8 +837,9 @@ class Model:
             cursor.execute(
                 "select m.mult_idmulta, m.mult_nombre, m.mult_valor from multa m where m.mult_idmulta= {0};".format(id))
             result = cursor.fetchone()
+            m = [entities.Entities.multaEntity(result)]
             connection.close()
-            return result
+            return m
         except Exception as ex:
             raise Exception(ex)
 
@@ -910,7 +913,8 @@ class Model:
                         "select td.tipdoc_id,td.tipdoc_nombre from tipo_documento td")
                     result = cursor.fetchall()
                     connection.close()
-                    return result
+                    td = entities.Entities.listTipoDocumentos(result)
+                    return td
                 except Exception as ex:
                     raise Exception(ex)
 
@@ -924,9 +928,10 @@ class Model:
                 cursor = connection.cursor()
                 cursor.execute(
                     "select td.tipdoc_id, td.tipdoc_nombre from tipo_documento td where td.tipdoc_id= '{0}';".format(id))
-                result = cursor.fetchall()
+                result = cursor.fetchone()
                 connection.close()
-                return result
+                td = [entities.Entities.tipodocumentoEntity(result)]
+                return td
             except Exception as ex:
                 raise Exception(ex)
 
@@ -1084,7 +1089,7 @@ class Model:
                 connection = conn.get_connection()
                 cursor = connection.cursor()
                 cursor.execute(
-                "select s.serv_idservicios, s.tipserv_id, s.serv_nombreservicio, s.serv_descripcion, s.serv_valor, s.serv_iva, s.serv_cantidad from servicios s")
+                "select * from get_servicios")
                 result = cursor.fetchall()
                 connection.close()
                 serv = entities.Entities.listServicios(result)
@@ -1100,7 +1105,7 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select s.serv_idservicios, s.tipserv_id, s.serv_nombreservicio, s.serv_descripcion, s.serv_valor, s.serv_iva, s.serv_cantidad from servicios s where s.serv_idservicios= {0};".format(id))
+                "select * from get_servicios s where s.serv_idservicios= {0};".format(id))
             result = cursor.fetchall()
             connection.close()
             serv = entities.Entities.listServicios(result)
@@ -1173,10 +1178,11 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select r.resv_idreservacion, r.serv_idservicios, r.resv_fecha, r.resv_descripcion from reservaciones r")
+                "select*from get_reservaciones")
             result = cursor.fetchall()
             connection.close()
-            return result
+            r = entities.Entities.listReservaciones(result)
+            return r
         except Exception as ex:
             raise Exception(ex)
 
@@ -1187,10 +1193,11 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select r.resv_idreservacion, r.serv_idservicios, r.resv_fecha, r.resv_descripcion from reservaciones r where r.resv_idreservacion= {0} ".format(id))
+                "select*from get_reservaciones r where r.resv_idreservacion= {0} ".format(id))
             result = cursor.fetchone()
             connection.close()
-            return result
+            r = [entities.Entities.reservacionesEntity(result)]
+            return r
         except Exception as ex:
             raise Exception(ex)
 
@@ -1259,10 +1266,11 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select a.alic_id, a.alic_idalicuota, a.alic_valor, a.alic_fecha from alicuota_actualizada a")
+                "select*from get_alicuota_actualizada")
             result = cursor.fetchall()
             connection.close()
-            return result
+            a = entities.Entities.listAlicuotasActualizadas(result)
+            return a
         except Exception as ex:
             raise Exception(ex)
 
@@ -1274,10 +1282,11 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select a.alic_id, a.alic_idalicuota, a.alic_valor, a.alic_fecha  from alicuota_actualizada a where a.alic_id= {0} for json path;".format(id))
+                "select*from get_alicuota_actualizada a where a.alic_id= {0};".format(id))
             result = cursor.fetchone()
             connection.close()
-            return result
+            a = [entities.Entities.alicuota_actualizadaEntity(result)]
+            return a
         except Exception as ex:
             raise Exception(ex)
     
@@ -1291,8 +1300,7 @@ class Model:
                 cursor.execute("INSERT INTO alicuota_actualizada( alic_valor, alic_fecha ) values('{0}', '{1}')".format(
                 data['alic_valor'], data['alic_fecha']))
                 rows_affects = cursor.rowcount
-                id_ac = cursor.execute(
-                    "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
+                id_ac = cursor.fetchone()[0]
                 connection.commit()
                 if rows_affects > 0:
                     ac = self.get_alicuotaActualizada_byid(id_ac)

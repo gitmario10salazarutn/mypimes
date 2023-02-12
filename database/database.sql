@@ -352,3 +352,20 @@ alter table reunion
 alter column secretario int not null;
 ALTER TABLE reunion
 ADD CONSTRAINT fk_sec_reu FOREIGN KEY (secretario) REFERENCES secretario (sec_idsecretario) ON DELETE CASCADE ON UPDATE CASCADE;
+CREATE OR REPLACE VIEW public.get_tesoreros AS
+SELECT u.rol_idrol,
+    u.rol_nombrerol,
+    u.pers_persona,
+    u.pers_email,
+    u.pers_nombres,
+    u.pers_apellidos,
+    u.pers_telefono,
+    u.pers_direccion,
+    u.user_idusuario,
+    u.user_estado,
+    u.user_fecha,
+    u.user_password,
+    p.tes_idtesorero,
+    p.estado_delete
+FROM get_usuarios u
+    JOIN tesorero p ON p.user_idusuario::text = u.user_idusuario::text;

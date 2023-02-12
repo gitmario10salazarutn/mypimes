@@ -52,7 +52,7 @@ class Entities:
 			"user_idusuario": usuario[8],
 			"user_password": usuario[11],
 			"user_estado": usuario[9],
-			"user_fecha": usuario[10],
+			"user_fecha": usuario[10].strftime('%d/%m/%Y'),
             "rol_usuario": {
                 "rol_idrol": usuario[0],
 			    "rol_nombrerol": usuario[1]
@@ -113,48 +113,23 @@ class Entities:
     def alicuota_actualizadaEntity(self, alicuota_actualizada) -> dict:
         if alicuota_actualizada:
             return {
-                "alic_id": alicuota_actualizada[0],
+                "alic_id": alicuota_actualizada[9],
                 "alicuota": {
-                    "ali_idalicuota": alicuota_actualizada[1],
+                    "ali_idalicuota": alicuota_actualizada[4],
                     "multa": {
-                        "mult_idmulta": alicuota_actualizada[2],
-                        "mult_nombre": alicuota_actualizada[3],
-                        "mult_valor": alicuota_actualizada[4]
+                        "mult_idmulta": alicuota_actualizada[0],
+                        "mult_nombre": alicuota_actualizada[1],
+                        "mult_valor": alicuota_actualizada[2]
                 },
                     "ali_fecha_actualizacion": alicuota_actualizada[5],
                     "ali_valor_anterior": alicuota_actualizada[6],
                     "ali_valor_actual": alicuota_actualizada[7]
                 },
-                "alic_valor": alicuota_actualizada[8],
-                "alic_fecha": alicuota_actualizada[9]
+                "alic_valor": alicuota_actualizada[10],
+                "alic_fecha": alicuota_actualizada[11].strftime('%d/%m/%Y')
             }
         else:
             return None
-
-    @classmethod
-    def tesoreroEntity(self, tesorero) -> dict:
-        if tesorero:
-            return {
-                "tes_idtesorero": tesorero[0],
-                "usuario": {
-			"user_idusuario": tesorero[8],
-			"user_password": tesorero[11],
-			"user_estado": tesorero[9],
-			"user_fecha": tesorero[10],
-            "rol_usuario": {
-                "rol_idrol": tesorero[0],
-			    "rol_nombrerol": tesorero[1]
-            },
-            "persona": {
-                "pers_persona": tesorero[2],
-                "pers_email": tesorero[3],
-                "pers_nombres": tesorero[4],
-                "pers_apellidos": tesorero[5],
-                "pers_telefono": tesorero[6], 
-                "pers_direccion": tesorero[7]
-            }
-        }
-            }
 
     @classmethod
     def listAlicuotasActualizadas(self, alicuota_actualizadas) -> list:
@@ -183,20 +158,16 @@ class Entities:
     
             "tipo_documento":{
                 "tipdoc_id":documentos[1]
-                
                 },
             "secretario":{
-                "sec_idsecretario":documentos[2],
+                "sec_idsecretario":documentos[2]
             },
 
             "doc_descripcion":documentos[3],
             "doc_documento":documentos[4],
             "doc_entidad":documentos[5],
-            "doc_recibido":documentos[6],
-     
-                
-         }
-          
+            "doc_recibido":documentos[6]                
+        }
         else:
             return None
 
@@ -232,20 +203,57 @@ class Entities:
             return  {
 			"reun_idreunion": reunion[0],
 			"presidente":{
-                "pres_idpresidente":reunion[1]
+                "pres_idpresidente": reunion[1],
+                "usuario": {
+                    "user_idusuario": reunion[17],
+                    "user_password": reunion[20],
+                    "user_estado": reunion[18],
+                    "user_fecha": reunion[19].strftime('%d/%m/%Y'),
+                    "rol_usuario": {
+                        "rol_idrol": reunion[9],
+                        "rol_nombrerol": reunion[10]
+                        },
+                    "persona": {
+                        "pers_persona": reunion[11],
+                        "pers_email": reunion[12],
+                        "pers_nombres": reunion[13],
+                        "pers_apellidos": reunion[14],
+                        "pers_telefono": reunion[15], 
+                        "pers_direccion": reunion[16]
+                    }
+                }
             },
-            "multa":{
-            "mult_idmulta":reunion[2]  
+            "multa": {
+                "mult_idmulta": reunion[2],
+                "mult_nombre": reunion[37],
+                "mult_valor": reunion[38]
             },
-            "reun_fecha":reunion[3],
-            "reun_hora":reunion[4],
+            "reun_fecha":reunion[3].strftime('%d/%m/%Y'),
+            "reun_hora":reunion[4].strftime("%H:%M:%S"),
             "reun_descripcion":reunion[5],
             "reun_quorum":reunion[6],
             "reun_estado":reunion[7],
-            "secretario":{
-                "sec_idsecretario":reunion[8]
+            "secretario": {
+                "sec_idsecretario": reunion[8],
+                "usuario": {
+                    "user_idusuario": reunion[31],
+                    "user_password": reunion[34],
+                    "user_estado": reunion[32],
+                    "user_fecha": reunion[33].strftime('%d/%m/%Y'),
+                    "rol_usuario": {
+                        "rol_idrol": reunion[23],
+                        "rol_nombrerol": reunion[24]
+                        },
+                    "persona": {
+                        "pers_persona": reunion[25],
+                        "pers_email": reunion[26],
+                        "pers_nombres": reunion[27],
+                        "pers_apellidos": reunion[28],
+                        "pers_telefono": reunion[29], 
+                        "pers_direccion": reunion[30]
+                    }
+                }
             }
-			
         }
         else:
             return None
@@ -332,7 +340,7 @@ class Entities:
     def secretarioEntity(self, secretario) -> dict:
         if secretario:
             return {
-                "tes_idsecretario": secretario[12],
+                "sec_idsecretario": secretario[12],
                 "usuario": {
                     "user_idusuario": secretario[8],
                     "user_password": secretario[11],
@@ -364,7 +372,7 @@ class Entities:
     def presidenteEntity(self, presidente) -> dict:
         if presidente:
             return {
-                "tes_idpresidente": presidente[12],
+                "pres_idpresidente": presidente[12],
                 "usuario": {
                     "user_idusuario": presidente[8],
                     "user_password": presidente[11],
@@ -396,7 +404,7 @@ class Entities:
     def condominoEntity(self, condomino) -> dict:
         if condomino:
             return {
-                "tes_idcondomino": condomino[12],
+                "cond_idcondomino": condomino[12],
                 "usuario": {
                     "user_idusuario": condomino[8],
                     "user_password": condomino[11],
@@ -445,13 +453,14 @@ class Entities:
             return {
                 "serv_idservicios": servicio[0],
                 "tipo_servicio": {
-                    "tipserv_id": servicio[1],
-                    "serv_nombreservicio": servicio[2],
-                    "serv_descripcion": servicio[3],
-                    "serv_valor": servicio[4],
-                    "serv_iva": servicio[5],
-                    "serv_cantidad": servicio[6]
-                }
+                "tipserv_id": servicio[1],
+                "tipserv_nombre": servicio[2]
+                },
+                    "serv_nombreservicio": servicio[3],
+                    "serv_descripcion": servicio[4],
+                    "serv_valor": servicio[5],
+                    "serv_iva": servicio[6],
+                    "serv_cantidad": servicio[7]
             }
         else:
             return None
@@ -551,7 +560,7 @@ class Entities:
         return [self.detalleEgresoEntity(detaleegreso) for detaleegreso in detaleegresos]
 
     @classmethod
-    def documentoEntity(self, data) -> dict:
+    def documentoEntity1(self, data) -> dict:
         if data:
             return {
                 "_id": str(data['_id']),
@@ -567,13 +576,117 @@ class Entities:
             return None
 
     @classmethod
-    def listDocumentos(self, documentos) -> list:
+    def listDocumentos1(self, documentos) -> list:
         return [self.documentoEntity(doc) for doc in documentos]
 
+    @classmethod
+    def reservacionesEntity(self, reservacion) -> dict:
+        if reservacion:
+            return {
+                "resv_idreservacion": reservacion[0],
+                "servicios": {
+                "serv_idservicios": reservacion[1],
+                "tipo_servicio": {
+                "tipserv_id": reservacion[2],
+                "tipserv_nombre": reservacion[3]
+                },
+                    "serv_nombreservicio": reservacion[4],
+                    "serv_descripcion": reservacion[5],
+                    "serv_valor": reservacion[6],
+                    "serv_iva": reservacion[7],
+                    "serv_cantidad": reservacion[8]
+            },
+                "resv_fecha": reservacion[9],
+                "resv_descripcion": reservacion[10],
+                "estado_delete": reservacion[11]
+            }
+        else:
+            return None
 
+    @classmethod
+    def listReservaciones(self, reservaciones) -> list:
+        return [self.reservacionesEntity(resv) for resv in reservaciones]
 
+    @classmethod
+    def detalleReservacionesEntity(self, detres) -> dict:
+        if detres:
+            return {
+                "detres_iddetalle": detres[14],
+                "reservacion":{
+                    "resv_idreservacion": detres[0],
+                    "servicios":{
+                        "serv_idservicios": detres[4],
+                        "tipo_servicio":{
+                            "tipserv_id": detres[11],
+                            "tipserv_nombre": detres[12]
+                        },
+                        "serv_nombreservicio": detres[5],
+                        "serv_descripcion": detres[6],
+                        "serv_valor": detres[7],
+                        "serv_iva": detres[8],
+                        "serv_cantidad": detres[9]
+                    },
+                    "resv_fecha": detres[1],
+                    "resv_descripcion": detres[2],
+                    "estado_delete": detres[3]
+                },
+                "secretario":{
+                    "tes_idsecretario": detres[35],
+                    "usuario":{
+                        "user_idusuario": detres[31],
+                        "user_password": detres[34],
+                        "user_estado": detres[32],
+                        "user_fecha": detres[33],
+                        "rol_usuario":{
+                            "rol_idrol": detres[23],
+                            "rol_nombrerol": detres[24]
+                        },
+                        "persona":{
+                            "pers_persona": detres[25],
+                            "pers_email": detres[26],
+                            "pers_nombres": detres[27],
+                            "pers_apellidos": detres[28],
+                            "pers_telefono": detres[29],
+                            "pers_direccion": detres[30]
+                        }
+                    }
+                },
+                "condomino":{
+                    "tes_idcondomino": detres[49],
+                    "usuario":{
+                        "user_idusuario": detres[45],
+                        "user_password": detres[48],
+                        "user_estado": detres[46],
+                        "user_fecha": detres[47],
+                        "rol_usuario":{
+                            "rol_idrol": detres[37],
+                            "rol_nombrerol": detres[38]
+                        },
+                        "persona":{
+                            "pers_persona": detres[39],
+                            "pers_email": detres[40],
+                            "pers_nombres": detres[41],
+                            "pers_apellidos": detres[42],
+                            "pers_telefono": detres[43],
+                            "pers_direccion": detres[44]
+                        }
+                    }
+                },
+                "detres_subtotal": detres[15],
+                "detres_iva": detres[16],
+                "detres_total": detres[17],
+                "detres_cantidad": detres[18],
+                "detres_horainicio": detres[19],
+                "detres_horafin": detres[20],
+                "detres_fecha": detres[21],
+                "estado_delete": detres[22]
+                }
+        else:
+            return None
 
-
+    @classmethod
+    def listDetalleReservaciones(self, detalle_reservaciones) -> list:
+        return [self.detalleReservacionesEntity(dr) for dr in detalle_reservaciones]
 
 
 

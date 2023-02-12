@@ -428,9 +428,6 @@ def delete_documento(doc_iddocumento):
 
 
 
-
-
-
 ##estado_documento
 @main.route('/get_estado_documentoTODO', methods=['GET'])
 def get_estado_documentoTODO():
@@ -473,7 +470,6 @@ def create_estado_documento():
     try:
         data = request.json
         c_td = model.Model.create_estado_documento(data)
-        print(c_td)
         if c_td is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
@@ -557,7 +553,7 @@ def get_multas():
         if multas is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return multas[0]
+            return multas
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -571,7 +567,7 @@ def get_multas_byid(id_multa):
         if multa_id is None:
             return jsonify({'message': 'Person not found!'}), 404
         else:
-            return multa_id[0]
+            return multa_id
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -818,11 +814,11 @@ def delete_servicios(id_servicios):
 @main.route('/get_reservaciones', methods=['GET'])
 def get_reservaciones():
     try:
-        reseraciones = model.Model.get_reservaciones()
-        if reseraciones is None:
+        reservaciones = model.Model.get_reservaciones()
+        if reservaciones is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return reseraciones[0]
+            return reservaciones
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -835,7 +831,7 @@ def get_reservaciones_byid(id_reservaciones):
         if reservaciones_id is None:
             return jsonify({'message': 'Reservations not found!'}), 404
         else:
-            return reservaciones_id[0]
+            return reservaciones_id
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -886,11 +882,11 @@ def delete_reservaciones(id_reservaciones):
 @main.route('/get_alicuotaActualizada', methods=['GET'])
 def get_alicuotaActualizada():
     try:
-        reseraciones = model.Model.get_alicuotaActualizada()
-        if reseraciones is None:
+        a = model.Model.get_alicuotaActualizada()
+        if a is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return reseraciones[0]
+            return a
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -902,7 +898,7 @@ def get_alicuotaActualizada_byid(id_alicuotaac):
         if ac_id is None:
             return jsonify({'message': 'updated aliquot not found!'}), 404
         else:
-            return ac_id[0]
+            return ac_id
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -915,7 +911,7 @@ def create_alicuotaActualizada():
         if ac is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return ac[0]
+            return ac
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -931,7 +927,7 @@ def update_alicuotaActualizada(id_alicuotaac):
         else:
             return jsonify({
                 'message': 'Aliquot updated successfully!',
-                'point': ac[0]
+                'point': ac
             })
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
