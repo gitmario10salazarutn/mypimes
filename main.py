@@ -622,7 +622,7 @@ def get_tipoDocumentos():
         if tipodoc is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return tipodoc[0]
+            return tipodoc
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -634,7 +634,7 @@ def get_tipoDocumentos_byid(id_documento):
         if tipoDocumentos_id is None:
             return jsonify({'message': 'Person not found!'}), 404
         else:
-            return tipoDocumentos_id[0]
+            return tipoDocumentos_id
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -686,7 +686,7 @@ def get_tipo_servicios():
         if tise is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return tise[0]
+            return tise
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -700,7 +700,7 @@ def get_tipo_servicios_byid(id_servicio):
         if tipoServicio_id is None:
             return jsonify({'message': 'Person not found!'}), 404
         else:
-            return tipoServicio_id[0]
+            return tipoServicio_id
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -751,7 +751,7 @@ def get_servicio():
         if servicio is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return servicio[0]
+            return servicio
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -766,7 +766,7 @@ def get_servicio_byid(id_servicio):
         if Servicios_id is None:
             return jsonify({'message': 'Service not found!'}), 404
         else:
-            return Servicios_id[0]
+            return Servicios_id
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 

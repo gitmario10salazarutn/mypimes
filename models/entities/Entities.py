@@ -254,46 +254,46 @@ class Entities:
     def listReunion(self, reuniones) -> list:
         return [self.reunionEntity(r) for r in reuniones]
 
-@classmethod
-def detallePagoEntity(self, detallepago) -> dict:
-    if detallepago:
-        return {
-                "detpag_id": detallepago[0],
-                "alicuota": {
-                "ali_idalicuota": detallepago[0],
-                "multa": {
-                    "mult_idmulta": detallepago[1],
-                    "mult_nombre": detallepago[2],
-                    "mult_valor": detallepago[3]
-                },
-                "ali_fecha_actualizacion": detallepago[4].strftime('%d/%m/%Y'),
-                "ali_valor_anterior": detallepago[5],
-                "ali_valor_actual": detallepago[6]
-            },
-                "alicuota_actualizada": {
-                "alic_id": detallepago[0],
-                "alicuota": {
-                    "ali_idalicuota": detallepago[1],
+    @classmethod
+    def detallePagoEntity(self, detallepago) -> dict:
+        if detallepago:
+            return {
+                    "detpag_id": detallepago[0],
+                    "alicuota": {
+                    "ali_idalicuota": detallepago[0],
                     "multa": {
-                        "mult_idmulta": detallepago[2],
-                        "mult_nombre": detallepago[3],
-                        "mult_valor": detallepago[4]
+                        "mult_idmulta": detallepago[1],
+                        "mult_nombre": detallepago[2],
+                        "mult_valor": detallepago[3]
+                    },
+                    "ali_fecha_actualizacion": detallepago[4].strftime('%d/%m/%Y'),
+                    "ali_valor_anterior": detallepago[5],
+                    "ali_valor_actual": detallepago[6]
                 },
-                    "ali_fecha_actualizacion": detallepago[5],
-                    "ali_valor_anterior": detallepago[6],
-                    "ali_valor_actual": detallepago[7]
+                    "alicuota_actualizada": {
+                    "alic_id": detallepago[0],
+                    "alicuota": {
+                        "ali_idalicuota": detallepago[1],
+                        "multa": {
+                            "mult_idmulta": detallepago[2],
+                            "mult_nombre": detallepago[3],
+                            "mult_valor": detallepago[4]
+                    },
+                        "ali_fecha_actualizacion": detallepago[5],
+                        "ali_valor_anterior": detallepago[6],
+                        "ali_valor_actual": detallepago[7]
+                    },
+                    "alic_valor": detallepago[8],
+                    "alic_fecha": detallepago[9].strftime('%d/%m/%Y')
                 },
-                "alic_valor": detallepago[8],
-                "alic_fecha": detallepago[9].strftime('%d/%m/%Y')
-            },
-                "detpag_subtotal": detallepago[3],
-                "detpag_iva": detallepago[4],
-                "detpag_total": detallepago[5],
-                "detpag_fecha": detallepago[6],
-                "detpag_multa": detallepago[7]
-            }
-    else:
-        return None
+                    "detpag_subtotal": detallepago[3],
+                    "detpag_iva": detallepago[4],
+                    "detpag_total": detallepago[5],
+                    "detpag_fecha": detallepago[6],
+                    "detpag_multa": detallepago[7]
+                }
+        else:
+            return None
 
     #07
     @classmethod

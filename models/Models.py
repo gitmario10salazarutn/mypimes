@@ -145,12 +145,10 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO persona(pers_persona, pers_email, pers_nombres, pers_apellidos, pers_telefono, pers_direccion) values('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
+                cursor.execute("INSERT INTO persona(pers_persona, pers_email, pers_nombres, pers_apellidos, pers_telefono, pers_direccion) values('{0}', '{1}', '{2}', '{3}', '{4}', '{5}') RETURNING pers_persona".format(
                     data['pers_persona'], data['pers_email'], data['pers_nombres'], data['pers_apellidos'], data['pers_telefono'], data['pers_direccion']))
                 rows_affects = cursor.rowcount
-                id_persona = cursor.execute(
-                    "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
-                print(rows_affects)
+                id_persona = cursor.fetchone()[0]
                 connection.commit()
                 if rows_affects > 0:
                     persona = entities.Persona(id_persona, data['pers_email'], data['pers_nombres'],
@@ -230,11 +228,10 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO rol_usuario(rol_nombrerol, prefijo) values('{0}', '{1}')".format(
+                cursor.execute("INSERT INTO rol_usuario(rol_nombrerol, prefijo) values('{0}', '{1}')RETURNING rol_idrol".format(
                     data['rol_nombrerol'], data['prefijo']))
                 rows_affects = cursor.rowcount
-                id_rol = cursor.execute(
-                    "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
+                id_rol = cursor.fetchone()[0]
                 connection.commit()
                 if rows_affects > 0:
                     rol = self.get_rolusuario_byid(id_rol)
@@ -405,12 +402,14 @@ class Model:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
                 rol = self.get_rolusuario_byid(data['rol_idrol'])
-                u = json.loads(rol[0])[0]
+                u = rol[0]
                 id = u['prefijo']+id_user[4:]
                 user_to_assign = self.get_usuario_byid(id)
                 user = self.get_usuario_byid(id_user)
-                if user and user_to_assign is None:
-                    pers = json.loads(user[0])[0]
+                print(user_to_assign, user)
+                if user and user_to_assign[0] is None:
+                    pers = user[0]
+                    print(pers['persona'].get('pers_persona'))
                     iduser = ''
                     if int(data['rol_idrol']) == 1:
                         iduser = 'PRE-' + pers['persona'].get('pers_persona')
@@ -421,16 +420,16 @@ class Model:
                     if int(data['rol_idrol']) == 4:
                         iduser = 'CON-' + pers['persona'].get('pers_persona')
                     fecha = datetime.now()
-                    password = pers['user_usuario'].get('user_password')
+                    password = pers['user_password']
                     hashed = generate_password_hash(password)
                     da = {
                         "user_idusuario": iduser,
                         "user_password": hashed,
-                        "user_estado": pers['user_usuario'].get('user_estado'),
+                        "user_estado": pers['user_estado'],
                         "user_email": pers['persona'].get('pers_email')
                     }
                     cursor.execute(
-                        "INSERT INTO user_usuario(user_idusuario, rol_idrol, pers_persona, user_password, user_estado, user_fecha) values('{0}', {1}, '{2}', '{3}', {4}, '{5}')".format(iduser, data['rol_idrol'], pers['persona'].get('pers_persona'), hashed, pers['user_usuario'].get('user_estado'), fecha))
+                        "INSERT INTO user_usuario(user_idusuario, rol_idrol, pers_persona, user_password, user_estado, user_fecha) values('{0}', {1}, '{2}', '{3}', {4}, '{5}')".format(iduser, data['rol_idrol'], pers['persona'].get('pers_persona'), hashed, pers['user_estado'], fecha))
                     if int(data['rol_idrol']) == 1:
                         cursor.execute(
                             "INSERT INTO presidente(user_idusuario) values('{0}')".format(iduser))
@@ -445,6 +444,7 @@ class Model:
                             "INSERT INTO condomino(user_idusuario) values('{0}')".format(iduser))
                     rows_affects = cursor.rowcount
                     connection.commit()
+                    print('here')
                     if rows_affects > 0:
                         print(self.create_users(da))
                         user = self.get_usuario_byid(iduser)
@@ -511,11 +511,10 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO tipo_documento(tipdoc_nombre) values('{0}')".format(
+                cursor.execute("INSERT INTO tipo_documento(tipdoc_nombre) values('{0}') RETURNING ".format(
                     data['tipdoc_nombre']))
                 rows_affects = cursor.rowcount
-                id_td = cursor.execute(
-                    "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
+                id_td = cursor.fetchone()[0]
                 print(rows_affects)
                 connection.commit()
                 if rows_affects > 0:
@@ -762,11 +761,10 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO reunion(pres_idpresidente,mult_idmulta,reun_fecha,reun_hora,reun_descripcion,reun_quorum,reun_estado,secretario) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}')".format(
+                cursor.execute("INSERT INTO reunion(pres_idpresidente,mult_idmulta,reun_fecha,reun_hora,reun_descripcion,reun_quorum,reun_estado,secretario) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}') RETURNING reun_idreunion".format(
                    data['reun_idreunion'], data['pres_idpresidente'],data[' mult_idmulta'],data['reun_fecha'],data['reun_hora'],data['reun_descripcion'],data['reun_quorum'],data['reun_estado'],data['secretario'] ))
                 rows_affects = cursor.rowcount
-                id_td = cursor.execute(
-                    "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
+                id_td = cursor.fetchone()[0]
                 print(rows_affects)
                 connection.commit()
                 if rows_affects > 0:
@@ -820,7 +818,7 @@ class Model:
                 connection = conn.get_connection()
                 cursor = connection.cursor()
                 cursor.execute(
-                    "declare @multas nvarchar(max) set @multas = (select m.mult_idmulta, m.mult_nombre, m.mult_valor from multa m for json path ) select @multas as multas return")
+                    "select m.mult_idmulta, m.mult_nombre, m.mult_valor from multa m")
                 result = cursor.fetchone()
                 connection.close()
                 return result
@@ -835,7 +833,7 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select m.mult_idmulta, m.mult_nombre, m.mult_valor from multa m where m.mult_idmulta= {0} for json path;".format(id))
+                "select m.mult_idmulta, m.mult_nombre, m.mult_valor from multa m where m.mult_idmulta= {0};".format(id))
             result = cursor.fetchone()
             connection.close()
             return result
@@ -849,11 +847,10 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO multa(mult_nombre, mult_valor) values('{0}', '{1}')".format(
+                cursor.execute("INSERT INTO multa(mult_nombre, mult_valor) values('{0}', '{1}') RETURNING mult_idmulta".format(
                     data['mult_nombre'], data['mult_valor']))
                 rows_affects = cursor.rowcount
-                id_multas = cursor.execute(
-                    "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
+                id_multas = cursor.fetchone()[0]
                 connection.commit()
                 if rows_affects > 0:
                     multas = self.get_multas_byid(id_multas)
@@ -910,8 +907,8 @@ class Model:
                     connection = conn.get_connection()
                     cursor = connection.cursor()
                     cursor.execute(
-                        "declare @tipodoc nvarchar(max) set @tipodoc = (select td.tipdoc_id,td.tipdoc_nombre from tipo_documento td for json path ) select @tipodoc as tipodoc return")
-                    result = cursor.fetchone()
+                        "select td.tipdoc_id,td.tipdoc_nombre from tipo_documento td")
+                    result = cursor.fetchall()
                     connection.close()
                     return result
                 except Exception as ex:
@@ -926,8 +923,8 @@ class Model:
                 connection = conn.get_connection()
                 cursor = connection.cursor()
                 cursor.execute(
-                    "select td.tipdoc_id, td.tipdoc_nombre from tipo_documento td where td.tipdoc_id= '{0}' for json path;".format(id))
-                result = cursor.fetchone()
+                    "select td.tipdoc_id, td.tipdoc_nombre from tipo_documento td where td.tipdoc_id= '{0}';".format(id))
+                result = cursor.fetchall()
                 connection.close()
                 return result
             except Exception as ex:
@@ -941,11 +938,10 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO tipo_documento(tipdoc_nombre) values('{0}')".format(
+                cursor.execute("INSERT INTO tipo_documento(tipdoc_nombre) values('{0}') RETURNING tipdoc_id".format(
                     data['tipdoc_nombre']))
                 rows_affects = cursor.rowcount
-                id_tido = cursor.execute(
-                    "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
+                id_tido = cursor.fetchone()[0]
                 connection.commit()
                 if rows_affects > 0:
                     rol = self.get_tipoDocumentos_byid(id_tido)
@@ -997,10 +993,11 @@ class Model:
                 connection = conn.get_connection()
                 cursor = connection.cursor()
                 cursor.execute(
-                    "declare @tise nvarchar(max) set @tise = ( select ts.tipserv_id, ts.tipserv_nombre from tipo_servicios ts for json path ) select @tise as tise return")
-                result = cursor.fetchone()
+                    "select ts.tipserv_id, ts.tipserv_nombre from tipo_servicios ts")
+                result = cursor.fetchall()
                 connection.close()
-                return result
+                ts = entities.Entities.listTipoServicios(result)
+                return ts
             except Exception as ex:
                 raise Exception(ex)
     
@@ -1012,10 +1009,11 @@ class Model:
                 connection = conn.get_connection()
                 cursor = connection.cursor()
                 cursor.execute(
-                    "select ts.tipserv_id, ts.tipserv_nombre from tipo_servicios ts where ts.tipserv_id= {0} for json path;".format(id))
+                    "select ts.tipserv_id, ts.tipserv_nombre from tipo_servicios ts where ts.tipserv_id= {0};".format(id))
                 result = cursor.fetchone()
+                ts = [entities.Entities.tipoServicioEntity(result)]
                 connection.close()
-                return result
+                return ts
             except Exception as ex:
                 raise Exception(ex)
 
@@ -1027,11 +1025,10 @@ class Model:
             try:
                 connection = conn.get_connection()
                 with connection.cursor() as cursor:
-                    cursor.execute("INSERT INTO tipo_servicios(tipserv_nombre) values('{0}')".format(
+                    cursor.execute("INSERT INTO tipo_servicios(tipserv_nombre) values('{0}') RETURNING tipserv_id".format(
                         data['tipserv_nombre']))
                     rows_affects = cursor.rowcount
-                    id_ts = cursor.execute(
-                        "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
+                    id_ts = cursor.fetchone()[0]
                     connection.commit()
                     if rows_affects > 0:
                         ts = self.get_tipo_servicios_byid(id_ts)
@@ -1087,11 +1084,11 @@ class Model:
                 connection = conn.get_connection()
                 cursor = connection.cursor()
                 cursor.execute(
-               ## "declare @servicio nvarchar(max) set @servicio = (select s.serv_idservicios as 'servicios.serv_idservicios', s.s as 'serv_idservicios.s', p.eje_focal as 'parabola.eje_focal', v.id_punto as 'vertice.id_punto', v.coord_x as 'vertice.coord_x', v.coord_y as 'vertice.coord_y' from parabola p inner join punto v on p.vertice = v.id_punto for json path) select @parabolas as parabolas return")
-                "declare @servicio nvarchar(max) set @servicio = ( select s.serv_idservicios, s.tipserv_id, s.serv_nombreservicio, s.serv_descripcion, s.serv_valor, s.serv_iva, s.serv_cantidad from servicios s for json path ) select @servicio as servicio return")
-                result = cursor.fetchone()
+                "select s.serv_idservicios, s.tipserv_id, s.serv_nombreservicio, s.serv_descripcion, s.serv_valor, s.serv_iva, s.serv_cantidad from servicios s")
+                result = cursor.fetchall()
                 connection.close()
-                return result
+                serv = entities.Entities.listServicios(result)
+                return serv
             except Exception as ex:
                 raise Exception(ex)
 
@@ -1103,10 +1100,11 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select s.serv_idservicios, s.tipserv_id, s.serv_nombreservicio, s.serv_descripcion, s.serv_valor, s.serv_iva, s.serv_cantidad from servicios s where s.serv_idservicios= {0} for json path;".format(id))
-            result = cursor.fetchone()
+                "select s.serv_idservicios, s.tipserv_id, s.serv_nombreservicio, s.serv_descripcion, s.serv_valor, s.serv_iva, s.serv_cantidad from servicios s where s.serv_idservicios= {0};".format(id))
+            result = cursor.fetchall()
             connection.close()
-            return result
+            serv = entities.Entities.listServicios(result)
+            return serv
         except Exception as ex:
             raise Exception(ex)
 
@@ -1117,11 +1115,10 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO servicios(tipserv_id, serv_nombreservicio, serv_descripcion, serv_valor, serv_iva, serv_cantidad) values('{0}', '{1}','{2}', '{3}','{4}', '{5}')".format(
+                cursor.execute("INSERT INTO servicios(tipserv_id, serv_nombreservicio, serv_descripcion, serv_valor, serv_iva, serv_cantidad) values('{0}', '{1}','{2}', '{3}','{4}', '{5}') RETURNING serv_idservicios".format(
                     data['tipserv_id'], data['serv_nombreservicio'], data['serv_descripcion'], data['serv_valor'], data['serv_iva'], data['serv_cantidad']))
                 rows_affects = cursor.rowcount
-                id_servicio = cursor.execute(
-                    "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
+                id_servicio = cursor.fetchone()[0]
                 connection.commit()
                 if rows_affects > 0:
                     servicio = self.get_servicio_byid(id_servicio)
@@ -1176,8 +1173,8 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "declare @reservacion nvarchar(max) set @reservacion = ( select r.resv_idreservacion, r.serv_idservicios, r.resv_fecha, r.resv_descripcion from reservaciones r for json path ) select @reservacion as reservacion return")
-            result = cursor.fetchone()
+                "select r.resv_idreservacion, r.serv_idservicios, r.resv_fecha, r.resv_descripcion from reservaciones r")
+            result = cursor.fetchall()
             connection.close()
             return result
         except Exception as ex:
@@ -1190,7 +1187,7 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select r.resv_idreservacion, r.serv_idservicios, r.resv_fecha, r.resv_descripcion from reservaciones r where r.resv_idreservacion= {0} for json path;".format(id))
+                "select r.resv_idreservacion, r.serv_idservicios, r.resv_fecha, r.resv_descripcion from reservaciones r where r.resv_idreservacion= {0} ".format(id))
             result = cursor.fetchone()
             connection.close()
             return result
@@ -1203,11 +1200,10 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO reservaciones(serv_idservicios, resv_fecha, resv_descripcion) values('{0}', '{1}','{2}')".format(
+                cursor.execute("INSERT INTO reservaciones(serv_idservicios, resv_fecha, resv_descripcion) values('{0}', '{1}','{2}') RETURNING resv_idreservacion".format(
                     data['serv_idservicios'], data['resv_fecha'],data['resv_descripcion']))
                 rows_affects = cursor.rowcount
-                id_reservaciones = cursor.execute(
-                    "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
+                id_reservaciones = cursor.fetchone()[0]
                 connection.commit()
                 if rows_affects > 0:
                     rol = self.get_reservaciones_byid(id_reservaciones)
@@ -1263,8 +1259,8 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "declare @alicuotaac nvarchar(max) set @alicuotaac = ( select a.alic_id, a.alic_idalicuota, a.alic_valor, a.alic_fecha from alicuota_actualizada a for json path ) select @alicuotaac as alicuotaac return")
-            result = cursor.fetchone()
+                "select a.alic_id, a.alic_idalicuota, a.alic_valor, a.alic_fecha from alicuota_actualizada a")
+            result = cursor.fetchall()
             connection.close()
             return result
         except Exception as ex:
