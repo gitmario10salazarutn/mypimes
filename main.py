@@ -88,7 +88,7 @@ def get_personas():
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-@main.route('/get_personas_byid/<id_persona>', methods=['GET'])
+@main.route('/get_persona_byid/<id_persona>', methods=['GET'])
 def get_persona_byid(id_persona):
     try:
         persona = model.Model.get_persona_byid(id_persona)
@@ -312,6 +312,398 @@ def get_detalle_reservaciones_byid(id_areservacion):
             return [None]
         else:
             return ac_id
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/create_detalle_reservaciones', methods=['POST'])
+def create_detalle_reservaciones():
+    try:
+        data = request.json
+        a = model.Model.create_detalle_reservacion(data)
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Detalle Reservacion inserted successfully!',
+                'alicuota': a[0]
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/update_detalle_reservaciones/<id>', methods=['PUT'])
+def update_detalle_reservaciones(id):
+    try:
+        data = request.json
+        a = model.Model.update_detalle_reservacion(id, data)
+        if a is None:
+            return jsonify({'message': 'Detalle Reservacion updated failed, Detalle Reservacion not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Detalle Reservacion updated successfully!',
+                'detalla_pago': a
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/delete_detalle_reservacion/<id>', methods=['DELETE'])
+def delete_detalle_reservacion(id):
+    try:
+        row_affect = model.Model.delete_detalle_reservacion(id)
+        return jsonify(row_affect)
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+
+
+# **************************************************************************************************
+
+# Alicuotas
+
+@main.route('/get_alicuotas', methods=['GET'])
+def get_alicuotas():
+    try:
+        a  = model.Model.get_alicuotas()
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/get_alicuota_byid/<id>', methods=['GET'])
+def get_alicuota_byid(id):
+    try:
+        a = model.Model.get_alicuota_byid(id)
+        if a[0] is None:
+            return [None]
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/create_alicuota', methods=['POST'])
+def create_alicuota():
+    try:
+        data = request.json
+        a = model.Model.create_alicuota(data)
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Alicuota inserted successfully!',
+                'alicuota': a[0]
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/update_alicuota/<id>', methods=['PUT'])
+def update_alicuota(id):
+    try:
+        data = request.json
+        a = model.Model.update_alicuota(id, data)
+        if a is None:
+            return jsonify({'message': 'Alicuota updated failed, Alicuota not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Alicuota updated successfully!',
+                'alicuota': a
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/delete_alicuota/<id>', methods=['DELETE'])
+def delete_alicuota(id):
+    try:
+        row_affect = model.Model.delete_alicuota(id)
+        return jsonify(row_affect)
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+# **************************************************************************************************
+
+# Pago Alicuotas
+
+@main.route('/get_pago_alicuotas', methods=['GET'])
+def get_pago_alicuotas():
+    try:
+        a  = model.Model.get_pago_alicuotas()
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/get_pago_alicuota_byid/<id>', methods=['GET'])
+def get_pago_alicuota_byid(id):
+    try:
+        a = model.Model.get_pago_alicuota_byid(id)
+        if a[0] is None:
+            return [None]
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/create_pago_alicuota', methods=['POST'])
+def create_pago_alicuota():
+    try:
+        data = request.json
+        a = model.Model.create_pago_alicuota(data)
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Pago Alicuota inserted successfully!',
+                'alicuota': a[0]
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/update_pago_alicuota/<id>', methods=['PUT'])
+def update_pago_alicuota(id):
+    try:
+        data = request.json
+        a = model.Model.update_pago_alicuota(id, data)
+        if a is None:
+            return jsonify({'message': 'Pago Alicuota updated failed, Alicuota not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Pago Alicuota updated successfully!',
+                'alicuota': a
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/delete_pago_alicuota/<id>', methods=['DELETE'])
+def delete_pago_alicuota(id):
+    try:
+        row_affect = model.Model.delete_pago_alicuota(id)
+        return jsonify(row_affect)
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+
+# **************************************************************************************************
+
+# Detalle Pago
+
+@main.route('/get_detalle_pagos', methods=['GET'])
+def get_detalle_pagos():
+    try:
+        a  = model.Model.get_detalle_pagos()
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/get_detalle_pago_byid/<id>', methods=['GET'])
+def get_detalle_pago_byid(id):
+    try:
+        a = model.Model.get_detalle_pago_byid(id)
+        if a[0] is None:
+            return [None]
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/create_detalle_pago', methods=['POST'])
+def create_detalle_pago():
+    try:
+        data = request.json
+        a = model.Model.create_detalle_pago(data)
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Detalle Pago inserted successfully!',
+                'alicuota': a[0]
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/update_detalle_pago/<id>', methods=['PUT'])
+def update_detalle_pago(id):
+    try:
+        data = request.json
+        a = model.Model.update_detalle_pago(id, data)
+        if a is None:
+            return jsonify({'message': 'Detalle Pago updated failed, Alicuota not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Detalle Pago updated successfully!',
+                'detalla_pago': a
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/delete_detalle_pago/<id>', methods=['DELETE'])
+def delete_detalle_pago(id):
+    try:
+        row_affect = model.Model.delete_detalle_pago(id)
+        return jsonify(row_affect)
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+
+# **************************************************************************************************
+
+# Egresos
+
+@main.route('/get_egresos', methods=['GET'])
+def get_egresos():
+    try:
+        a  = model.Model.get_egresos()
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/get_egreso_byid/<id>', methods=['GET'])
+def get_egreso_byid(id):
+    try:
+        a = model.Model.get_egreso_byid(id)
+        if a[0] is None:
+            return [None]
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/create_egreso', methods=['POST'])
+def create_egreso():
+    try:
+        data = request.json
+        a = model.Model.create_egreso(data)
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Egreso inserted successfully!',
+                'egreso': a[0]
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/update_egreso/<id>', methods=['PUT'])
+def update_egreso(id):
+    try:
+        data = request.json
+        a = model.Model.update_egreso(id, data)
+        if a is None:
+            return jsonify({'message': 'Egreso updated failed, Egreso not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Egreso updated successfully!',
+                'egreso': a
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/delete_egreso/<id>', methods=['DELETE'])
+def delete_egreso(id):
+    try:
+        row_affect = model.Model.delete_egreso(id)
+        return jsonify(row_affect)
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+
+
+# **************************************************************************************************
+
+# Egresos
+
+@main.route('/get_detalle_egresos', methods=['GET'])
+def get_detalle_egresos():
+    try:
+        a  = model.Model.get_detalle_egresos()
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/get_detalle_egreso_byid/<id>', methods=['GET'])
+def get_detalle_egreso_byid(id):
+    try:
+        a = model.Model.get_detalle_egreso_byid(id)
+        if a[0] is None:
+            return [None]
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/create_detalle_egreso', methods=['POST'])
+def create_detalle_egreso():
+    try:
+        data = request.json
+        a = model.Model.create_detalle_egreso(data)
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Egreso inserted successfully!',
+                'egreso': a[0]
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/update_detalle_egreso/<id>', methods=['PUT'])
+def update_detalle_egreso(id):
+    try:
+        data = request.json
+        a = model.Model.update_detalle_egreso(id, data)
+        if a is None:
+            return jsonify({'message': 'Detalle Egreso updated failed, Egreso not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Detalle Egreso updated successfully!',
+                'egreso': a
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/delete_detalle_egreso/<id>', methods=['DELETE'])
+def delete_detalle_egreso(id):
+    try:
+        row_affect = model.Model.delete_detalle_egreso(id)
+        return jsonify(row_affect)
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 

@@ -152,9 +152,8 @@ class Model:
                 id_persona = cursor.fetchone()[0]
                 connection.commit()
                 if rows_affects > 0:
-                    persona = entities.Persona(id_persona, data['pers_email'], data['pers_nombres'],
-                                               data['pers_apellidos'], data['pers_telefono'], data['pers_direccion'])
-                    return persona.convert_to_json()
+                    persona = self.get_persona_byid(id_persona)
+                    return persona
                 else:
                     return {'message': 'Error, Insert failed!'}
         except Exception as ex:
@@ -469,6 +468,7 @@ class Model:
         except Exception as ex:
             return Exception(ex)
 
+    # Detalle Reservaciones
 
     @classmethod
     def get_detalle_reservaciones(self):
@@ -496,6 +496,475 @@ class Model:
             connection.close()
             a = [entities.Entities.detalleReservacionesEntity(result)]
             return a
+        except Exception as ex:
+            raise Exception(ex)
+
+
+    @classmethod
+    def create_detalle_reservacion(self, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("insert into detalle_reservaciones (reservacion, sec_idsecretario, condomino, detres_subtotal, detres_iva, detres_total, detres_cantidad, detres_horainicio, detres_horafin, detres_fecha, estado_delete_detres) values({0}, {1}, {2}, {3}, {4}, {5}, {6}, '{7}', '{8}', '{9}', '{10}') returning detres_iddetalle;".format(data['reservacion'], data['sec_idsecretario'], data['condomino'], data['detres_subtotal'], data['detres_iva'], data['detres_total'], data['detres_cantidad'], data['detres_horainicio'], data['detres_horafin'], data['detres_fecha'], data['estado_delete_detres']))
+                rows_affects = cursor.rowcount
+                id = cursor.fetchone()[0]
+                connection.commit()
+                if rows_affects > 0:
+                    a = self.get_detalle_reservaciones_byid(id)
+                    return a
+                else:
+                    return {'message': 'Error, Insert failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def update_detalle_reservacion(self, id, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE detalle_reservaciones SET reservacion = {0}, sec_idsecretario = {1}, condomino = {2}, detres_subtotal = {3}, detres_iva = {4}, detres_total = {5}, detres_cantidad = {6}, detres_horainicio = '{7}', detres_horafin = '{8}', detres_fecha = '{9}', estado_delete_detres = '{10}' WHERE detres_iddetalle = {11}".format(data['reservacion'], data['sec_idsecretario'], data['condomino'], data['detres_subtotal'], data['detres_iva'], data['detres_total'], data['detres_cantidad'], data['detres_horainicio'], data['detres_horafin'], data['detres_fecha'], data['estado_delete_detres'], id))
+                rows_affects = cursor.rowcount
+                connection.commit()
+                if rows_affects > 0:
+                    a   = self.get_detalle_reservaciones_byid(id)[0]
+                    return a
+                else:
+                    return {'message': 'Error, Update failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def delete_detalle_reservacion(self, id):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM detalle_reservaciones WHERE detres_iddetalle = '{0}'".format(id))
+                row_affects = cursor.rowcount
+                connection.commit()
+                if row_affects > 0:
+                    return {'message': 'Detalle Reservaciones deleted successfully!'}
+                else:
+                    return {'message': 'Error, Delete detalle Reservaciones failed, Detalle Reservaciones not found!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+
+
+# **************************************************************************************************
+
+    # Alicuotas
+
+
+    @classmethod
+    def get_alicuotas(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_alicuotas")
+            result = cursor.fetchall()
+            connection.close()
+            alicuotas = entities.Entities.listAlicuotas(result)
+            return alicuotas
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def get_alicuota_byid(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_alicuotas p where p.id_alicuota = {0};".format(id))
+            result = cursor.fetchone()
+            connection.close()
+            person = [entities.Entities.alicuotaEntity(result)]
+            return person
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def create_alicuota(self, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("insert into alicuota (mult_idmulta, ali_fecha_actualizacion, ali_valor_anterior, ali_valor_actual, estado_delete_alicuota) values({0}, '{1}', {2}, {3}, '{4}') returning ali_idalicuota;".format(
+                    data['mult_idmulta'], data['ali_fecha_actualizacion'], data['ali_valor_anterior'], data['ali_valor_actual'], data['estado_delete_alicuota']))
+                rows_affects = cursor.rowcount
+                id = cursor.fetchone()[0]
+                connection.commit()
+                if rows_affects > 0:
+                    a = self.get_alicuota_byid(id)
+                    return a
+                else:
+                    return {'message': 'Error, Insert failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def update_alicuota(self, id, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE alicuota SET mult_idmulta = {0}, ali_fecha_actualizacion = '{1}', ali_valor_anterior = {2}, ali_valor_actual = {3}, estado_delete_alicuota = '{4}' WHERE ali_idalicuota = '{5}'".format(data['mult_idmulta'], data['ali_fecha_actualizacion'], data['ali_valor_anterior'], data['ali_valor_actual'], data['estado_delete_alicuota'], id))
+                rows_affects = cursor.rowcount
+                connection.commit()
+                if rows_affects > 0:
+                    a   = self.get_alicuota_byid(id)[0]
+                    return a
+                else:
+                    return {'message': 'Error, Update failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def delete_alicuota(self, id):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM alicuota WHERE ali_idalicuota = '{0}'".format(id))
+                row_affects = cursor.rowcount
+                connection.commit()
+                if row_affects > 0:
+                    return {'message': 'Alicuota deleted successfully!'}
+                else:
+                    return {'message': 'Error, Delete alicuota failed, person not found!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+
+# **************************************************************************************************
+
+    # Pago Alicuotas
+
+
+    @classmethod
+    def get_pago_alicuotas(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_pago_alicuotas")
+            result = cursor.fetchall()
+            connection.close()
+            alicuotas = entities.Entities.listPagoAlicuotas(result)
+            return alicuotas
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def get_pago_alicuota_byid(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_pago_alicuotas p where p.pagali_id = {0};".format(id))
+            result = cursor.fetchone()
+            connection.close()
+            person = [entities.Entities.pago_alicuotaEntity(result)]
+            return person
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def create_pago_alicuota(self, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("insert into pago_alicuota (tes_idtesorero, cond_idcondomino, pagali_fecha, pagali_numero, pagali_subtotal, pagali_iva, pagali_total, estado_delete_pagali)  values({0}, {1}, '{2}', '{3}', {4}, {5}, {6}, '{7}') returning pagali_id".format(data['tes_idtesorero'], data['cond_idcondomino'], data['pagali_fecha'], data['pagali_numero'], data['pagali_subtotal'], data['pagali_iva'], data['pagali_total'], data['estado_delete_pagali']))
+                rows_affects = cursor.rowcount
+                id = cursor.fetchone()[0]
+                connection.commit()
+                if rows_affects > 0:
+                    a = self.get_pago_alicuota_byid(id)
+                    return a
+                else:
+                    return {'message': 'Error, Insert failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def update_pago_alicuota(self, id, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE pago_alicuota SET tes_idtesorero = {0}, cond_idcondomino = {1}, pagali_fecha = '{2}', pagali_numero = '{3}', pagali_subtotal = {4}, pagali_iva = {5}, pagali_total = {6}, estado_delete_pagali = '{7}' WHERE pagali_id = '{8}'".format(data['tes_idtesorero'], data['cond_idcondomino'], data['pagali_fecha'], data['pagali_numero'], data['pagali_subtotal'], data['pagali_iva'], data['pagali_total'], data['estado_delete_pagali'], id))
+                rows_affects = cursor.rowcount
+                connection.commit()
+                if rows_affects > 0:
+                    a   = self.get_pago_alicuota_byid(id)[0]
+                    return a
+                else:
+                    return {'message': 'Error, Update failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def delete_pago_alicuota(self, id):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM pago_alicuota WHERE pagali_id = '{0}'".format(id))
+                row_affects = cursor.rowcount
+                connection.commit()
+                if row_affects > 0:
+                    return {'message': 'Pago Alicuota deleted successfully!'}
+                else:
+                    return {'message': 'Error, Delete pago alicuota failed, Pago alicuota not found!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+
+# **************************************************************************************************
+
+    # Detalle Pago
+
+
+    @classmethod
+    def get_detalle_pagos(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_detalle_pagos")
+            result = cursor.fetchall()
+            connection.close()
+            dp = entities.Entities.listDetallePagos(result)
+            return dp
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def get_detalle_pago_byid(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_detalle_pagos p where p.detpag_id = {0};".format(id))
+            result = cursor.fetchone()
+            connection.close()
+            dp = [entities.Entities.detallePagoEntity(result)]
+            return dp
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def create_detalle_pago(self, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("insert into detalle_pago (pagali_id, aliact_id, detpag_subtotal, detpag_iva, detpag_total, detpag_fecha, detpag_multa, estado_delete_detpag)  values({0}, {1}, {2}, {3}, {4}, '{5}', {6}, '{7}') returning detpag_id".format(data['pagali_id'], data['aliact_id'], data['detpag_subtotal'], data['detpag_iva'], data['detpag_total'], data['detpag_fecha'], data['detpag_multa'], data['estado_delete_detpag']))
+                rows_affects = cursor.rowcount
+                id = cursor.fetchone()[0]
+                connection.commit()
+                if rows_affects > 0:
+                    a = self.get_detalle_pago_byid(id)
+                    return a
+                else:
+                    return {'message': 'Error, Insert failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def update_detalle_pago(self, id, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE detalle_pago SET pagali_id = {0}, aliact_id = {1}, detpag_subtotal = {2}, detpag_iva = {3}, detpag_total = {4}, detpag_fecha = '{5}', detpag_multa = {6}, estado_delete_detpag = '{7}' WHERE detpag_id = '{8}'".format(data['pagali_id'], data['aliact_id'], data['detpag_subtotal'], data['detpag_iva'], data['detpag_total'], data['detpag_fecha'], data['detpag_multa'], data['estado_delete_detpag'], id))
+                rows_affects = cursor.rowcount
+                connection.commit()
+                if rows_affects > 0:
+                    a   = self.get_detalle_pago_byid(id)[0]
+                    return a
+                else:
+                    return {'message': 'Error, Update failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def delete_detalle_pago(self, id):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM detalle_pago WHERE detpag_id = '{0}'".format(id))
+                row_affects = cursor.rowcount
+                connection.commit()
+                if row_affects > 0:
+                    return {'message': 'Detalle Pago deleted successfully!'}
+                else:
+                    return {'message': 'Error, Delete detalle pago failed, Pago alicuota not found!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+
+
+# **************************************************************************************************
+
+    # Egresos
+
+
+    @classmethod
+    def get_egresos(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_egresos")
+            result = cursor.fetchall()
+            connection.close()
+            dp = entities.Entities.listEgresos(result)
+            return dp
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def get_egreso_byid(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_egresos p where p.egre_id = {0};".format(id))
+            result = cursor.fetchone()
+            connection.close()
+            dp = [entities.Entities.egresosEntity(result)]
+            return dp
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def create_egreso(self, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("insert into egresos (tes_idtesorero, egre_descripcion, egre_subtotal, egre_iva, egre_total, egre_fecha,egre_numero, estado_delete_egr)  values({0}, '{1}', {2}, {3}, {4}, '{5}', '{6}', '{7}') returning egre_id".format(data['tes_idtesorero'], data['egre_descripcion'], data['egre_subtotal'], data['egre_iva'], data['egre_total'], data['egre_fecha'], data['egre_numero'], data['estado_delete_egr']))
+                rows_affects = cursor.rowcount
+                id = cursor.fetchone()[0]
+                connection.commit()
+                if rows_affects > 0:
+                    a = self.get_egreso_byid(id)
+                    return a
+                else:
+                    return {'message': 'Error, Insert failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def update_egreso(self, id, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE egresos SET tes_idtesorero = {0}, egre_descripcion = '{1}', egre_subtotal = {2}, egre_iva = {3}, egre_total = {4}, egre_fecha = '{5}', egre_numero = '{6}', estado_delete_egr = '{7}' WHERE egre_id = '{8}'".format(data['tes_idtesorero'], data['egre_descripcion'], data['egre_subtotal'], data['egre_iva'], data['egre_total'], data['egre_fecha'], data['egre_numero'], data['estado_delete_egr'], id))
+                rows_affects = cursor.rowcount
+                connection.commit()
+                if rows_affects > 0:
+                    a   = self.get_egreso_byid(id)[0]
+                    return a
+                else:
+                    return None
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def delete_egreso(self, id):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM egresos WHERE egre_id = '{0}'".format(id))
+                row_affects = cursor.rowcount
+                connection.commit()
+                if row_affects > 0:
+                    return {'message': 'Egreso deleted successfully!'}
+                else:
+                    return {'message': 'Error, Delete Egreso failed, Egreso not found!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+
+
+# **************************************************************************************************
+
+    # Detalle Egresos
+
+
+    @classmethod
+    def get_detalle_egresos(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_detalle_egresos")
+            result = cursor.fetchall()
+            connection.close()
+            dp = entities.Entities.listDetalleEgresos(result)
+            return dp
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def get_detalle_egreso_byid(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_detalle_egresos p where p.detegre_id = {0};".format(id))
+            result = cursor.fetchone()
+            connection.close()
+            dp = [entities.Entities.detalleEgresoEntity(result)]
+            return dp
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def create_detalle_egreso(self, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("insert into detalle_egresos (egre_id, detegre_numerofactura, detegre_valorfactura, deteegre_documento, detegre_subtotal, detegre_iva, detegre_total, detegre_fecha, estado_delete_detegre) values({0}, '{1}', {2}, {3}, {4}, {5}, {6}, '{7}', '{8}') returning detegre_id".format(data['egre_id'], data['detegre_numerofactura'], data['detegre_valorfactura'], data['deteegre_documento'], data['detegre_subtotal'], data['detegre_iva'], data['detegre_total'], data['detegre_fecha'], data['estado_delete_detegre']))
+                rows_affects = cursor.rowcount
+                id = cursor.fetchone()[0]
+                connection.commit()
+                if rows_affects > 0:
+                    a = self.get_detalle_egreso_byid(id)
+                    return a
+                else:
+                    return {'message': 'Error, Insert failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def update_detalle_egreso(self, id, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE detalle_egresos SET egre_id = {0}, detegre_numerofactura = '{1}', detegre_valorfactura = {2}, deteegre_documento = {3}, detegre_subtotal = {4}, detegre_iva = {5}, detegre_total = {6}, detegre_fecha = '{7}', estado_delete_detegre = '{8}' WHERE detegre_id = '{9}'".format(data['egre_id'], data['detegre_numerofactura'], data['detegre_valorfactura'], data['deteegre_documento'], data['detegre_subtotal'], data['detegre_iva'], data['detegre_total'], data['detegre_fecha'], data['estado_delete_detegre'], id))
+                rows_affects = cursor.rowcount
+                connection.commit()
+                if rows_affects > 0:
+                    a   = self.get_detalle_egreso_byid(id)[0]
+                    return a
+                else:
+                    return None
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def delete_detalle_egreso(self, id):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM detalle_egresos WHERE detegre_id = '{0}'".format(id))
+                row_affects = cursor.rowcount
+                connection.commit()
+                if row_affects > 0:
+                    return {'message': 'Detalle Egreso deleted successfully!'}
+                else:
+                    return {'message': 'Error, Delete Detalle Egreso failed, Egreso not found!'}
         except Exception as ex:
             raise Exception(ex)
 

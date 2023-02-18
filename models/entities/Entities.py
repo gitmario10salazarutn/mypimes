@@ -92,21 +92,22 @@ class Entities:
     def alicuotaEntity(self, alicuota) -> dict:
         if alicuota:
             return {
-                "ali_idalicuota": alicuota[0],
+                "ali_idalicuota": alicuota[4],
                 "multa": {
-                    "mult_idmulta": alicuota[1],
-                    "mult_nombre": alicuota[2],
-                    "mult_valor": alicuota[3]
+                    "mult_idmulta": alicuota[0],
+                    "mult_nombre": alicuota[1],
+                    "mult_valor": alicuota[2]
                 },
-                "ali_fecha_actualizacion": alicuota[4],
-                "ali_valor_anterior": alicuota[5],
-                "ali_valor_actual": alicuota[6]
+                "ali_fecha_actualizacion": alicuota[5].strftime('%d/%m/%Y'),
+                "ali_valor_anterior": alicuota[6],
+                "ali_valor_actual": alicuota[7],
+                "estado_delete_alicuota": alicuota[8]
             }
         else:
             return None
 
     @classmethod
-    def listAlicotas(self, alicuotas) -> list:
+    def listAlicuotas(self, alicuotas) -> list:
         return [self.alicuotaEntity(alicuota) for alicuota in alicuotas]
 
     @classmethod
@@ -121,7 +122,7 @@ class Entities:
                         "mult_nombre": alicuota_actualizada[1],
                         "mult_valor": alicuota_actualizada[2]
                 },
-                    "ali_fecha_actualizacion": alicuota_actualizada[5],
+                    "ali_fecha_actualizacion": alicuota_actualizada[5].strftime('%d/%m/%Y'),
                     "ali_valor_anterior": alicuota_actualizada[6],
                     "ali_valor_actual": alicuota_actualizada[7]
                 },
@@ -284,35 +285,80 @@ class Entities:
     @classmethod
     def detallePagoEntity(self, detallepago) -> dict:
         if detallepago:
+            pa = detallepago[9:]
+            tesorero = pa[:14]
+            alicuota = pa[14:23]
+            condomino = pa[23:37]
+            alicuota_actualizada = pa[37:]
             return {
                     "detpag_id": detallepago[0],
-                    "alicuota": {
-                    "ali_idalicuota": detallepago[0],
-                    "multa": {
-                        "mult_idmulta": detallepago[1],
-                        "mult_nombre": detallepago[2],
-                        "mult_valor": detallepago[3]
+                    "pago_alicuota": {
+                        "pagali_id": pa[14],
+                        "tesorero": {
+                        "tes_idtesorero": tesorero[12],
+                        "usuario": {
+                            "user_idusuario": tesorero[8],
+                            "user_password": tesorero[11],
+                            "user_estado": tesorero[9],
+                            "user_fecha": tesorero[10].strftime('%d/%m/%Y'),
+                            "rol_usuario": {
+                                "rol_idrol": tesorero[0],
+                                "rol_nombrerol": tesorero[1]
+                                },
+                            "persona": {
+                                "pers_persona": tesorero[2],
+                                "pers_email": tesorero[3],
+                                "pers_nombres": tesorero[4],
+                                "pers_apellidos": tesorero[5],
+                                "pers_telefono": tesorero[6], 
+                                "pers_direccion": tesorero[7]
+                            }
+                        }
                     },
-                    "ali_fecha_actualizacion": detallepago[4].strftime('%d/%m/%Y'),
-                    "ali_valor_anterior": detallepago[5],
-                    "ali_valor_actual": detallepago[6]
-                },
+                        "condomino": {
+                        "cond_idcondomino": condomino[12],
+                        "usuario": {
+                            "user_idusuario": condomino[8],
+                            "user_password": condomino[11],
+                            "user_estado": condomino[9],
+                            "user_fecha": condomino[10].strftime('%d/%m/%Y'),
+                            "rol_usuario": {
+                                "rol_idrol": condomino[0],
+                                "rol_nombrerol": condomino[1]
+                                },
+                            "persona": {
+                                "pers_persona": condomino[2],
+                                "pers_email": condomino[3],
+                                "pers_nombres": condomino[4],
+                                "pers_apellidos": condomino[5],
+                                "pers_telefono": condomino[6], 
+                                "pers_direccion": condomino[7]
+                            }
+                        }
+                    },
+                        "pagali_fecha": alicuota[3].strftime('%d/%m%Y'),
+                        "pagali_numero": alicuota[4],
+                        "pagali_subtotal": alicuota[5],
+                        "pagali_iva": alicuota[6],
+                        "pagali_tota": alicuota[7],
+                        "estado_delete": alicuota[8]
+                    },
                     "alicuota_actualizada": {
-                    "alic_id": detallepago[0],
-                    "alicuota": {
-                        "ali_idalicuota": detallepago[1],
-                        "multa": {
-                            "mult_idmulta": detallepago[2],
-                            "mult_nombre": detallepago[3],
-                            "mult_valor": detallepago[4]
+                        "alic_id": alicuota_actualizada[9],
+                        "alicuota": {
+                            "ali_idalicuota": alicuota_actualizada[4],
+                            "multa": {
+                                "mult_idmulta": alicuota_actualizada[0],
+                                "mult_nombre": alicuota_actualizada[1],
+                                "mult_valor": alicuota_actualizada[2]
+                        },
+                            "ali_fecha_actualizacion": alicuota_actualizada[5].strftime('%d/%m/%Y'),
+                            "ali_valor_anterior": alicuota_actualizada[6],
+                            "ali_valor_actual": alicuota_actualizada[7]
+                        },
+                        "alic_valor": alicuota_actualizada[10],
+                        "alic_fecha": alicuota_actualizada[11].strftime('%d/%m/%Y')
                     },
-                        "ali_fecha_actualizacion": detallepago[5],
-                        "ali_valor_anterior": detallepago[6],
-                        "ali_valor_actual": detallepago[7]
-                    },
-                    "alic_valor": detallepago[8],
-                    "alic_fecha": detallepago[9].strftime('%d/%m/%Y')
-                },
                     "detpag_subtotal": detallepago[3],
                     "detpag_iva": detallepago[4],
                     "detpag_total": detallepago[5],
@@ -321,6 +367,10 @@ class Entities:
                 }
         else:
             return None
+
+    @classmethod
+    def listDetallePagos(self, detpags) -> list:
+        return [self.detallePagoEntity(dp) for dp in detpags]
 
     #07
     @classmethod
@@ -489,28 +539,30 @@ class Entities:
         return [self.serviciosEntity(serv) for serv in servicios]
 
     @classmethod
-    def egresosEntity(self, egreso) -> dict:
-        if egreso:
+    def egresosEntity(self, e) -> dict:
+        if e:
+            tesorero = e[:14]
+            egreso = e[14:]
             return {
                 "egre_id": egreso[0],
                 "tesorero": {
-                "tes_idtesorero": egreso[12],
+                "tes_idtesorero": tesorero[12],
                 "usuario": {
-                    "user_idusuario": egreso[8],
-                    "user_password": egreso[11],
-                    "user_estado": egreso[9],
-                    "user_fecha": egreso[10].strftime('%d/%m/%Y'),
+                    "user_idusuario": tesorero[8],
+                    "user_password": tesorero[11],
+                    "user_estado": tesorero[9],
+                    "user_fecha": tesorero[10].strftime('%d/%m/%Y'),
                     "rol_usuario": {
-                        "rol_idrol": egreso[0],
-                        "rol_nombrerol": egreso[1]
+                        "rol_idrol": tesorero[0],
+                        "rol_nombrerol": tesorero[1]
                         },
                     "persona": {
-                        "pers_persona": egreso[2],
-                        "pers_email": egreso[3],
-                        "pers_nombres": egreso[4],
-                        "pers_apellidos": egreso[5],
-                        "pers_telefono": egreso[6], 
-                        "pers_direccion": egreso[7]
+                        "pers_persona": tesorero[2],
+                        "pers_email": tesorero[3],
+                        "pers_nombres": tesorero[4],
+                        "pers_apellidos": tesorero[5],
+                        "pers_telefono": tesorero[6], 
+                        "pers_direccion": tesorero[7]
                     }
                 }
             },
@@ -525,54 +577,31 @@ class Entities:
             return None
 
     @classmethod
-    def listEgresos(self, egresos, tesorero) -> list:
-        return [self.egresosEntity(egreso, tesorero) for egreso in egresos]
+    def listEgresos(self, egresos) -> list:
+        return [self.egresosEntity(egreso) for egreso in egresos]
 
     @classmethod
     def detalleEgresoEntity(self, detalleegreso) -> dict:
         if detalleegreso:
+            doc = detalleegreso[10:35]
+            e = detalleegreso[35:]
+            print('Here')
+            print(doc)
+            print(e)
+            print('End')
             return {
                 "detegre_id": detalleegreso[0],
-                "egreso": {
-                "egre_id": detalleegreso[0],
-                    "tesorero": {
-                    "tes_idtesorero": detalleegreso[12],
-                        "usuario": {
-                            "user_idusuario": detalleegreso[8],
-                            "user_password": detalleegreso[11],
-                            "user_estado": detalleegreso[9],
-                            "user_fecha": detalleegreso[10].strftime('%d/%m/%Y'),
-                            "rol_usuario": {
-                                "rol_idrol": detalleegreso[0],
-                                "rol_nombrerol": detalleegreso[1]
-                                },
-                            "persona": {
-                                "pers_persona": detalleegreso[2],
-                                "pers_email": detalleegreso[3],
-                                "pers_nombres": detalleegreso[4],
-                                "pers_apellidos": detalleegreso[5],
-                                "pers_telefono": detalleegreso[6], 
-                                "pers_direccion": detalleegreso[7]
-                            }
-                        }
-                },
-                "egre_descripcion": detalleegreso[2],
-                "egre_subtotal": detalleegreso[3],
-                "egre_iva": detalleegreso[4],
-                "egre_total": detalleegreso[5],
-                "egre_fecha": detalleegreso[6],
-                "egre_numero": detalleegreso[7]
-            },
+                "egreso": self.egresosEntity(e),
                 "detegre_numerofactura": detalleegreso[2], 
                 "detegre_valorfactura": detalleegreso[3], 
-                "detegre_documento": {
-                    
-                },
-                "detegre_subtotal": detalleegreso[0],
-                "detegre_iva": detalleegreso[0],
-                "detegre_total": detalleegreso[0],
-                "detegre_fecha": detalleegreso[0]
+                "detegre_documento": self.documentoEntity(doc),
+                "detegre_subtotal": detalleegreso[5],
+                "detegre_iva": detalleegreso[6],
+                "detegre_total": detalleegreso[7],
+                "detegre_fecha": detalleegreso[8],
+                "estado_delete": detalleegreso[9]
             }
+
 
     @classmethod
     def listDetalleEgresos(self, detaleegresos) -> list:
@@ -596,7 +625,7 @@ class Entities:
                     "serv_iva": reservacion[7],
                     "serv_cantidad": reservacion[8]
             },
-                "resv_fecha": reservacion[9],
+                "resv_fecha": reservacion[9].strftime('%d/%m/%Y'),
                 "resv_descripcion": reservacion[10],
                 "estado_delete": reservacion[11]
             }
@@ -626,7 +655,7 @@ class Entities:
                         "serv_iva": detres[8],
                         "serv_cantidad": detres[9]
                     },
-                    "resv_fecha": detres[1],
+                    "resv_fecha": detres[1].strftime('%d/%m/%Y'),
                     "resv_descripcion": detres[2],
                     "estado_delete": detres[3]
                 },
@@ -636,7 +665,7 @@ class Entities:
                         "user_idusuario": detres[31],
                         "user_password": detres[34],
                         "user_estado": detres[32],
-                        "user_fecha": detres[33],
+                        "user_fecha": detres[33].strftime('%d/%m/%Y'),
                         "rol_usuario":{
                             "rol_idrol": detres[23],
                             "rol_nombrerol": detres[24]
@@ -657,7 +686,7 @@ class Entities:
                         "user_idusuario": detres[45],
                         "user_password": detres[48],
                         "user_estado": detres[46],
-                        "user_fecha": detres[47],
+                        "user_fecha": detres[47].strftime('%d/%m/%Y'),
                         "rol_usuario":{
                             "rol_idrol": detres[37],
                             "rol_nombrerol": detres[38]
@@ -678,7 +707,7 @@ class Entities:
                 "detres_cantidad": detres[18],
                 "detres_horainicio": detres[19].strftime("%H:%M:%S"),
                 "detres_horafin": detres[20].strftime("%H:%M:%S"),
-                "detres_fecha": detres[21],
+                "detres_fecha": detres[21].strftime('%d/%m/%Y'),
                 "estado_delete": detres[22]
                 }
         else:
@@ -687,3 +716,69 @@ class Entities:
     @classmethod
     def listDetalleReservaciones(self, detalle_reservaciones) -> list:
         return [self.detalleReservacionesEntity(dr) for dr in detalle_reservaciones]
+
+    @classmethod
+    def pago_alicuotaEntity(self, pa) -> dict:
+        if pa:
+            tesorero = pa[:14]
+            alicuota = pa[14:23]
+            condomino = pa[23:]
+            return {
+                "pagali_id": pa[14],
+                "tesorero": {
+                "tes_idtesorero": tesorero[12],
+                "usuario": {
+                    "user_idusuario": tesorero[8],
+                    "user_password": tesorero[11],
+                    "user_estado": tesorero[9],
+                    "user_fecha": tesorero[10].strftime('%d/%m/%Y'),
+                    "rol_usuario": {
+                        "rol_idrol": tesorero[0],
+                        "rol_nombrerol": tesorero[1]
+                        },
+                    "persona": {
+                        "pers_persona": tesorero[2],
+                        "pers_email": tesorero[3],
+                        "pers_nombres": tesorero[4],
+                        "pers_apellidos": tesorero[5],
+                        "pers_telefono": tesorero[6], 
+                        "pers_direccion": tesorero[7]
+                    }
+                }
+            },
+                "condomino": {
+                "cond_idcondomino": condomino[12],
+                "usuario": {
+                    "user_idusuario": condomino[8],
+                    "user_password": condomino[11],
+                    "user_estado": condomino[9],
+                    "user_fecha": condomino[10].strftime('%d/%m/%Y'),
+                    "rol_usuario": {
+                        "rol_idrol": condomino[0],
+                        "rol_nombrerol": condomino[1]
+                        },
+                    "persona": {
+                        "pers_persona": condomino[2],
+                        "pers_email": condomino[3],
+                        "pers_nombres": condomino[4],
+                        "pers_apellidos": condomino[5],
+                        "pers_telefono": condomino[6], 
+                        "pers_direccion": condomino[7]
+                    }
+                }
+            },
+                "pagali_fecha": alicuota[3].strftime('%d/%m%Y'),
+                "pagali_numero": alicuota[4],
+                "pagali_subtotal": alicuota[5],
+                "pagali_iva": alicuota[6],
+                "pagali_tota": alicuota[7],
+                "estado_delete": alicuota[8]
+            }
+        else:
+            return None
+
+    @classmethod
+    def listPagoAlicuotas(self, pag_alis) -> list:
+        return [self.pago_alicuotaEntity(pa) for pa in pag_alis]
+
+# (1, 22, 1, '2023-5-2', '000-025', 1897.12, 458.36, 2365.45, False)
