@@ -22,6 +22,20 @@ def connect_postgresql(hostname, dbname, username, password):
         print("Ocurrió un error al conectar a PostgreSQL: ", e)
         raise Exception(e)
 
+
+"""
+def connect_postgresql(hostname, dbname, username, password):
+    try:
+        conn_query = "host = '" + hostname + "' dbname = '" + dbname + "' user= '" + username + "' password= '" + password + "' port = '5432' sslmode = 'require'"
+        conn_post = conn.connect(conn_query)
+        print("Database connect successfully to PostgreSQL")
+        return conn_post
+    except Exception as e:
+        # Atrapar error
+        print("Ocurrió un error al conectar a PostgreSQL: ", e)
+        raise Exception(e)
+"""
+
 # Method to connect MongoDB Local
 def connect_MongoDB_local():
     try:
@@ -38,8 +52,6 @@ def connect_MongoDB(username, password, database):
         hostnae = "n1-c2-mongodb-clevercloud-customers.services.clever-cloud.com:27017,n2-c2-mongodb-clevercloud-customers.services.clever-cloud.com:27017"
         app = Flask(__name__)
         app.config["MONGO_URI"] = "mongodb://{0}:{1}@{2}/{3}".format(username, password, hostnae, database) # "mongodb+srv://{0}:{1}@{2}/{3}".format(username, password, hostname, database)
-        
-        print(app.config["MONGO_URI"])
         mongo = PyMongo(app)
         if mongo.db.with_options is not None:
             return mongo
@@ -65,15 +77,21 @@ def get_connection():
             config('HOST_NAME_HEROKU'),
             config('DATABASE_HEROKU'),
             config('USER_NAME_HEROKU'),
-            config('PASSWORD_HEROKU')
+            config('PASSWORD_HEROKU'),
+            #config('HOST_NAME_LOCAL'),
+            #config('DATABASE_LOCAL'),
+            #config('USER_NAME_LOCAL'),
+            #config('PASSWORD_LOCAL')
         )
         return connection
     except Exception as ex:
         raise ex
+
+"""
 a = get_connection()
 a = a.cursor()
-a.execute("select * from user_usuario")
+a.execute("select * from get_documentos")
 row = a.fetchall()
 for p in row:
     print(p)
-
+"""

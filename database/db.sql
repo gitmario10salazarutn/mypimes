@@ -81,6 +81,16 @@ insert into circunferencia(centro, radio)
 values(3, 5);
 insert into circunferencia(centro, radio)
 values(5, 6);
+insert into punto(coord_x, coord_y)
+values(-1, 3);
+insert into punto(coord_x, coord_y)
+values(-4, -1);
+insert into punto(coord_x, coord_y)
+values(0, 0);
+insert into punto(coord_x, coord_y)
+values(2, 5);
+insert into punto(coord_x, coord_y)
+values(2, -3);
 insert into elipse(centro, a, b, eje_focal)
 values(1, 4, 3, 'x');
 insert into elipse(centro, a, b, eje_focal)

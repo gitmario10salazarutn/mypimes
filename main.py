@@ -18,7 +18,7 @@ def get_user_byid(id_user):
     try:
         user = model.Model.get_user_byid(id_user)
         if user[0] is None:
-            return jsonify({'message': 'User not found!'}), 404
+            return [None]
         else:
             return user
     except Exception as ex:
@@ -92,9 +92,8 @@ def get_personas():
 def get_persona_byid(id_persona):
     try:
         persona = model.Model.get_persona_byid(id_persona)
-        print(persona)
-        if persona is None:
-            return jsonify({'message': 'Person not found!'}), 404
+        if persona[0] is None:
+            return [None]
         else:
             return persona
     except Exception as ex:
@@ -111,7 +110,7 @@ def create_persona():
         else:
             return jsonify({
                 'message': 'Person inserted successfully!',
-                'point': persona
+                'persona': persona
             })
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
@@ -123,11 +122,11 @@ def update_persona(id_persona):
         data = request.json
         persona = model.Model.update_persona(id_persona, data)
         if persona is None:
-            return jsonify({'message': 'Person updated failed, Point not found!'}), 404
+            return jsonify({'message': 'Person updated failed, Person not found!'}), 404
         else:
             return jsonify({
                 'message': 'Person updated successfully!',
-                'point': persona.convert_to_json()
+                'persona': persona
             })
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
@@ -159,9 +158,8 @@ def get_rolusuarios():
 def get_rolusuario_byid(id_rolusuario):
     try:
         rolusuario = model.Model.get_rolusuario_byid(id_rolusuario)
-        print(rolusuario)
-        if rolusuario is None:
-            return jsonify({'message': 'Usr rol not found!'}), 404
+        if rolusuario[0] is None:
+            return [None]
         else:
             return rolusuario
     except Exception as ex:
@@ -191,7 +189,7 @@ def update_rolusuario(id_rolusuario):
         else:
             return jsonify({
                 'message': 'User rol updated successfully!',
-                'point': rolusuario[0]
+                'rol_usuario': rolusuario[0]
             })
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
@@ -223,8 +221,8 @@ def get_usuarios():
 def get_usuario_byid(id_usuario):
     try:
         usuario = model.Model.get_usuario_byid(id_usuario)
-        if usuario is None:
-            return jsonify({'message': 'User not found!'}), 404
+        if usuario[0] is None:
+            return [None]
         else:
             return usuario
     except Exception as ex:
@@ -236,7 +234,6 @@ def create_usuario():
     try:
         data = request.json
         usuario = model.Model.create_usuario(data)
-        print(usuario)
         if usuario is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
@@ -283,7 +280,6 @@ def assign_roluser(id_user):
 def login(id_user, password):
     try:
         user = model.Model.login(id_user, password)
-        print(user,'Hello')
         if user == 1:
             return jsonify({'message': 'User inactive!'}),404
         elif user == -1:
@@ -294,258 +290,34 @@ def login(id_user, password):
             return user[0]
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
-######################## Tesorero
-@main.route('/get_tipo_documento', methods=['GET'])
-def get_tipo_documento():
+
+
+@main.route('/get_detalle_reservaciones', methods=['GET'])
+def get_detalle_reservaciones():
     try:
-        tps = model.Model.get_tipo_documento()
-        if tps is None:
+        a = model.Model.get_detalle_reservaciones()
+        if a is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return tps
+            return a
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-@main.route('/get_tipodocumento_byid/<tipdoc_id>', methods=['GET'])
-def get_tipodocumento_byid(tipdoc_id):
+@main.route('/get_detalle_reservaciones_byid/<id_areservacion>', methods=['GET'])
+def get_detalle_reservaciones_byid(id_areservacion):
     try:
-        td = model.Model.get_tipodocumento_byid(tipdoc_id)
-        print(td)
-        if td is None:
-            return jsonify({'message': 'Person not found!'}), 404
+        ac_id = model.Model.get_detalle_reservaciones_byid(id_areservacion)
+        if ac_id[0] is None:
+            return [None]
         else:
-            return td
+            return ac_id
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
+# **************************************************************************************************
 
-@main.route('/create_tipodocumento', methods=['POST'])
-def create_tipodocumento():
-    try:
-        data = request.json
-        c_td = model.Model.create_tipodocumento(data)
-        print(c_td)
-        if c_td is None:
-            return jsonify({'message': 'Data not found!'}), 404
-        else:
-            return c_td[0]
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-@main.route('/update_tipodocumento/<id_tipdoc>', methods=['PUT'])
-def update_tipodocumento(id_tipdoc):
-    try:
-        data = request.json
-        td = model.Model.update_tipodocumento(id_tipdoc, data)
-        if td is None:
-            return jsonify({'message': 'Type Document updated failed, Point not found!'}), 404
-        else:
-            return jsonify({
-                'message': 'Type Document updated successfully!',
-                'point': td.convert_to_json()
-            })
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-@main.route('/delete_tipodocumento/<id_tipdoc>', methods=['DELETE'])
-def delete_tipodocumento(id_tipdoc):
-    try:
-        row_affect = model.Model.delete_tipodocumento(id_tipdoc)
-        return jsonify(row_affect)
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-
-
-@main.route('/get_documento', methods=['GET'])
-def get_documento():
-    try:
-        tps = model.Model.get_documento()
-        if tps is None:
-            return jsonify({'message': 'Data not found!'}), 404
-        else:
-            return tps
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-@main.route('/get_documento_byid/<doc_iddocumento>', methods=['GET'])
-def get_documento_byid(doc_iddocumento):
-    try:
-        d = model.Model.get_documento_byid(doc_iddocumento)
-        print(d)
-        if d is None:
-            return jsonify({'message': 'Documento not found!'}), 404
-        else:
-            return d
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-
-@main.route('/create_documentos', methods=['POST'])
-def create_documentos():
-    try:
-        data = request.json
-        c_d = model.Model.create_documentos(data)
-        print(c_d)
-        if c_d is None:
-            return jsonify({'message': 'Data not found!'}), 404
-        else:
-            return c_d[0]
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-@main.route('/update_documento/<doc_iddocumento>', methods=['PUT'])
-def update_documento(doc_iddocumento):
-    try:
-        data = request.json
-        td = model.Model.update_documento(doc_iddocumento, data)
-        if td is None:
-            return jsonify({'message': 'Type Document updated failed, Point not found!'}), 404
-        else:
-            return jsonify({
-                'message': 'Type Document updated successfully!',
-                'point': td.convert_to_json()
-            })
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-@main.route('/delete_documento/<doc_iddocumento>', methods=['DELETE'])
-def delete_documento(doc_iddocumento):
-    try:
-        row_affect = model.Model.delete_documento(doc_iddocumento)
-        return jsonify(row_affect)
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-
-##estado_documento
-@main.route('/get_estado_documentoTODO', methods=['GET'])
-def get_estado_documentoTODO():
-    try:
-        tps = model.Model.get_estado_documentoTODO()
-        if tps is None:
-            return jsonify({'message': 'Data not found!'}), 404
-        else:
-            return tps
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 
-    
-    
-@main.route('/get_estado_documentoTRUE', methods=['GET'])
-def get_estado_documentoTRUE():
-    try:
-        tps = model.Model.get_estado_documentoTRUE()
-        if tps is None:
-            return jsonify({'message': 'Data not found!'}), 404
-        else:
-            return tps
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-@main.route('/get_estado_documentoFALSE', methods=['GET'])
-def get_estado_documentoFALSE():
-    try:
-        tps = model.Model.get_estado_documentoFALSE()
-        if tps is None:
-            return jsonify({'message': 'Data not found!'}), 404
-        else:
-            return tps
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-
-@main.route('/create_estado_documento', methods=['POST'])
-def create_estado_documento():
-    try:
-        data = request.json
-        c_td = model.Model.create_estado_documento(data)
-        if c_td is None:
-            return jsonify({'message': 'Data not found!'}), 404
-        else:
-            return c_td[0]
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-##reunion
-@main.route('/get_reunion', methods=['GET'])
-def get_reunion():
-    try:
-        tps = model.Model.get_reunion()
-        if tps is None:
-            return jsonify({'message': 'Data not found!'}), 404
-        else:
-            return tps
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 
-    
-@main.route('/get_reunion_byid/<reun_idreunion>', methods=['GET'])
-def get_reunion_byid(reun_idreunion):
-    try:
-        d = model.Model.get_reunion_byid(reun_idreunion)
-        print(d)
-        if d is None:
-            return jsonify({'message': 'Documento not found!'}), 404
-        else:
-            return d
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-   
-    
-@main.route('/create_reunion', methods=['POST'])
-def create_reunion():
-    try:
-        data = request.json
-        c_td = model.Model.create_reunion(data)
-        print(c_td)
-        if c_td is None:
-            return jsonify({'message': 'Data not found!'}), 404
-        else:
-            return c_td[0]
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-
-@main.route('/update_reunion/<id_reunion>', methods=['PUT'])
-def update_reunion(id_reunion):
-    try:
-        data = request.json
-        td = model.Model.update_reunion(id_reunion, data)
-        if td is None:
-            return jsonify({'message': 'Type Document updated failed, Point not found!'}), 404
-        else:
-            return jsonify({
-                'message': 'Type Document updated successfully!',
-                'point': td.convert_to_json()
-            })
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-
-@main.route('/delete_reunion/<id_reunion>', methods=['DELETE'])
-def delete_reunion(id_reunion):
-    try:
-        row_affect = model.Model.delete_reunion(id_reunion)
-        return jsonify(row_affect)
-    except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
-##-------------Multas-------------
-
-##---get
 @main.route('/get_multas', methods=['GET'])
 def get_multas():
     try:
@@ -564,8 +336,8 @@ def get_multas():
 def get_multas_byid(id_multa):
     try:
         multa_id = model.Model.get_multas_byid(id_multa)
-        if multa_id is None:
-            return jsonify({'message': 'Person not found!'}), 404
+        if multa_id[0] is None:
+            return [None]
         else:
             return multa_id
     except Exception as ex:
@@ -577,10 +349,10 @@ def create_multas():
     try:
         data = request.json
         multas = model.Model.create_multas(data)
-        if multas is None:
-            return jsonify({'message': 'Data not found!'}), 404
+        if multas[0] is None:
+            return [None]
         else:
-            return multas[0]
+            return multas
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -627,8 +399,8 @@ def get_tipoDocumentos():
 def get_tipoDocumentos_byid(id_documento):
     try:
         tipoDocumentos_id = model.Model.get_tipoDocumentos_byid(id_documento)
-        if tipoDocumentos_id is None:
-            return jsonify({'message': 'Person not found!'}), 404
+        if tipoDocumentos_id[0] is None:
+            return [None]
         else:
             return tipoDocumentos_id
     except Exception as ex:
@@ -643,7 +415,7 @@ def create_tipoDocumentos():
         if tipoDocumentos is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return tipoDocumentos[0]
+            return tipoDocumentos
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -657,7 +429,7 @@ def update_tipoDocumentos(id_tido):
         if tido is None:
             return jsonify({'message': 'Tipo de documento updated failed, Tipo de documento not found!'}), 404
         else:
-            return tido[0]
+            return tido
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -679,8 +451,8 @@ def delete_tipoDocumentos(id_tido):
 def get_tipo_servicios():
     try:
         tise = model.Model.get_tipo_servicios()
-        if tise is None:
-            return jsonify({'message': 'Data not found!'}), 404
+        if tise[0] is None:
+            return [None]
         else:
             return tise
     except Exception as ex:
@@ -693,8 +465,9 @@ def get_tipo_servicios():
 def get_tipo_servicios_byid(id_servicio):
     try:
         tipoServicio_id = model.Model.get_tipo_servicios_byid(id_servicio)
-        if tipoServicio_id is None:
-            return jsonify({'message': 'Person not found!'}), 404
+        print(tipoServicio_id)
+        if tipoServicio_id[0] is None:
+            return [None]
         else:
             return tipoServicio_id
     except Exception as ex:
@@ -709,7 +482,7 @@ def create_tipo_servicios():
         if tipoServicio is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return tipoServicio[0]
+            return tipoServicio
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -722,7 +495,7 @@ def update_tipo_servicio(id_tise):
             if tise is None:
                 return jsonify({'message': 'Tipo de servicio updated failed, Tipo de servicio not found!'}), 404
             else:
-                return tise[0]
+                return tise
         except Exception as ex:
             return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -740,10 +513,10 @@ def delete_tipo_servicio(id_rotise):
 
 #--get
 
-@main.route('/get_servicio', methods=['GET'])
-def get_servicio():
+@main.route('/get_servicios', methods=['GET'])
+def get_servicios():
     try:
-        servicio = model.Model.get_servicio()
+        servicio = model.Model.get_servicios()
         if servicio is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
@@ -759,8 +532,9 @@ def get_servicio():
 def get_servicio_byid(id_servicio):
     try:
         Servicios_id = model.Model.get_servicio_byid(id_servicio)
-        if Servicios_id is None:
-            return jsonify({'message': 'Service not found!'}), 404
+        print(Servicios_id)
+        if Servicios_id[0] is None:
+            return [None]
         else:
             return Servicios_id
     except Exception as ex:
@@ -775,7 +549,7 @@ def create_servicios():
         if Servicios is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return Servicios[0]
+            return Servicios
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
@@ -861,7 +635,7 @@ def update_reservaciones(id_reservaciones):
         else:
             return jsonify({
                 'message': 'Bookings updated successfully!',
-                'point': reservaciones[0]
+                'reservacion': reservaciones[0]
             })
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
@@ -879,10 +653,10 @@ def delete_reservaciones(id_reservaciones):
 
 ##---------------------------ALICUOTA ACTUALIZADA----------------------
 ## get 
-@main.route('/get_alicuotaActualizada', methods=['GET'])
-def get_alicuotaActualizada():
+@main.route('/get_alicuotaActualizadas', methods=['GET'])
+def get_alicuotaActualizadas():
     try:
-        a = model.Model.get_alicuotaActualizada()
+        a = model.Model.get_alicuotaActualizadas()
         if a is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
@@ -944,26 +718,183 @@ def delete_alicuotaActualizada(id_ac):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-@main.route('/get_detalle_reservaciones', methods=['GET'])
-def get_detalle_reservaciones():
+# **************************************************************************************************
+
+
+@main.route('/get_documentos', methods=['GET'])
+def get_documentos():
     try:
-        a = model.Model.get_detalle_reservaciones()
-        if a is None:
+        tps = model.Model.get_documentos()
+        if tps is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
-            return a
+            return tps
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-@main.route('/get_detalle_reservaciones_byid/<id_areservacion>', methods=['GET'])
-def get_detalle_reservaciones_byid(id_areservacion):
+@main.route('/get_documento_byid/<doc_iddocumento>', methods=['GET'])
+def get_documento_byid(doc_iddocumento):
     try:
-        ac_id = model.Model.get_detalle_reservaciones_byid(id_areservacion)
-        if ac_id is None:
-            return jsonify({'message': 'updated reservation detail not found!'}), 404
+        d = model.Model.get_documento_byid(doc_iddocumento)
+        if d[0] is None:
+            return [None]
         else:
-            return ac_id
+            return d
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+
+@main.route('/create_documentos', methods=['POST'])
+def create_documentos():
+    try:
+        data = request.json
+        c_d = model.Model.create_documentos(data)
+        if c_d is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return c_d[0]
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/update_documento/<doc_iddocumento>', methods=['PUT'])
+def update_documento(doc_iddocumento):
+    try:
+        data = request.json
+        td = model.Model.update_documento(doc_iddocumento, data)
+        if td is None:
+            return jsonify({'message': 'Type Document updated failed, Point not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Type Document updated successfully!',
+                'documento': td
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/delete_documento/<doc_iddocumento>', methods=['DELETE'])
+def delete_documento(doc_iddocumento):
+    try:
+        row_affect = model.Model.delete_documento(doc_iddocumento)
+        return jsonify(row_affect)
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+
+##estado_documento
+@main.route('/get_estado_documentoTODO', methods=['GET'])
+def get_estado_documentoTODO():
+    try:
+        tps = model.Model.get_estado_documentoTODO()
+        if tps is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return tps
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 
+    
+    
+@main.route('/get_estado_documentoTRUE', methods=['GET'])
+def get_estado_documentoTRUE():
+    try:
+        tps = model.Model.get_estado_documentoTRUE()
+        if tps is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return tps
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+@main.route('/get_estado_documentoFALSE', methods=['GET'])
+def get_estado_documentoFALSE():
+    try:
+        tps = model.Model.get_estado_documentoFALSE()
+        if tps is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return tps
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+
+@main.route('/create_estado_documento', methods=['POST'])
+def create_estado_documento():
+    try:
+        data = request.json
+        c_td = model.Model.create_estado_documento(data)
+        if c_td is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return c_td[0]
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+##reunion
+@main.route('/get_reuniones', methods=['GET'])
+def get_reuniones():
+    try:
+        tps = model.Model.get_reunion()
+        if tps is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return tps
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 
+    
+@main.route('/get_reunion_byid/<reun_idreunion>', methods=['GET'])
+def get_reunion_byid(reun_idreunion):
+    try:
+        d = model.Model.get_reunion_byid(reun_idreunion)
+        if d is None:
+            return jsonify({'message': 'Documento not found!'}), 404
+        else:
+            return d
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+   
+    
+@main.route('/create_reunion', methods=['POST'])
+def create_reunion():
+    try:
+        data = request.json
+        c_td = model.Model.create_reunion(data)
+        if c_td is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return c_td[0]
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+
+@main.route('/update_reunion/<id_reunion>', methods=['PUT'])
+def update_reunion(id_reunion):
+    try:
+        data = request.json
+        td = model.Model.update_reunion(id_reunion, data)
+        if td is None:
+            return jsonify({'message': 'Type Document updated failed, Point not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Type Document updated successfully!',
+                'point': td.convert_to_json()
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/delete_reunion/<id_reunion>', methods=['DELETE'])
+def delete_reunion(id_reunion):
+    try:
+        row_affect = model.Model.delete_reunion(id_reunion)
+        return jsonify(row_affect)
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 

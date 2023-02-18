@@ -133,9 +133,8 @@ class Entities:
 
     @classmethod
     def listAlicuotasActualizadas(self, alicuota_actualizadas) -> list:
-        return [self.alicuota_actualizadaEntity(alicuota_actualizada) for alicuota_actualizada in alicuota_actualizadas]
+        return [self.alicuota_actualizadaEntity(a) for a in alicuota_actualizadas]
 
-    ##############################Tesorero
     @classmethod
     def tipodocumentoEntity(self, tipodocumento) -> dict:
         if tipodocumento:
@@ -154,19 +153,39 @@ class Entities:
     def documentoEntity(self, documentos) -> dict:
         if documentos:
             return {
-            "doc_iddocumento": documentos[0],
+            "doc_iddocumento": documentos[14],
     
             "tipo_documento":{
-                "tipdoc_id":documentos[1]
-                },
-            "secretario":{
-                "sec_idsecretario":documentos[2]
+                "tipdoc_id": documentos[15],
+                "tipdoc_nombre": documentos[23]
             },
-
-            "doc_descripcion":documentos[3],
-            "doc_documento":documentos[4],
-            "doc_entidad":documentos[5],
-            "doc_recibido":documentos[6]                
+            "secretario": {
+                "sec_idsecretario": documentos[12],
+                "usuario": {
+                    "user_idusuario": documentos[8],
+                    "user_password": documentos[11],
+                    "user_estado": documentos[9],
+                    "user_fecha": documentos[10].strftime('%d/%m/%Y'),
+                    "rol_usuario": {
+                        "rol_idrol": documentos[0],
+                        "rol_nombrerol": documentos[1]
+                        },
+                    "persona": {
+                        "pers_persona": documentos[2],
+                        "pers_email": documentos[3],
+                        "pers_nombres": documentos[4],
+                        "pers_apellidos": documentos[5],
+                        "pers_telefono": documentos[6], 
+                        "pers_direccion": documentos[7]
+                    }
+                },
+                "estado_delete": documentos[13]
+            },
+            "doc_descripcion":documentos[17],
+            "doc_documento":documentos[18],
+            "doc_entidad":documentos[19],
+            "doc_recibido":documentos[20],
+            "estado_delete": documentos[21]                
         }
         else:
             return None
@@ -448,7 +467,7 @@ class Entities:
 
     #12
     @classmethod
-    def sericiosEntity(self, servicio) -> dict:
+    def serviciosEntity(self, servicio) -> dict:
         if servicio:
             return {
                 "serv_idservicios": servicio[0],
@@ -467,7 +486,7 @@ class Entities:
 
     @classmethod
     def listServicios(self, servicios) -> list:
-        return [self.sericiosEntity(serv) for serv in servicios]
+        return [self.serviciosEntity(serv) for serv in servicios]
 
     @classmethod
     def egresosEntity(self, egreso) -> dict:
@@ -516,27 +535,27 @@ class Entities:
                 "detegre_id": detalleegreso[0],
                 "egreso": {
                 "egre_id": detalleegreso[0],
-                "tesorero": {
-                "tes_idtesorero": detalleegreso[12],
-                "usuario": {
-                    "user_idusuario": detalleegreso[8],
-                    "user_password": detalleegreso[11],
-                    "user_estado": detalleegreso[9],
-                    "user_fecha": detalleegreso[10].strftime('%d/%m/%Y'),
-                    "rol_usuario": {
-                        "rol_idrol": detalleegreso[0],
-                        "rol_nombrerol": detalleegreso[1]
-                        },
-                    "persona": {
-                        "pers_persona": detalleegreso[2],
-                        "pers_email": detalleegreso[3],
-                        "pers_nombres": detalleegreso[4],
-                        "pers_apellidos": detalleegreso[5],
-                        "pers_telefono": detalleegreso[6], 
-                        "pers_direccion": detalleegreso[7]
-                    }
-                }
-            },
+                    "tesorero": {
+                    "tes_idtesorero": detalleegreso[12],
+                        "usuario": {
+                            "user_idusuario": detalleegreso[8],
+                            "user_password": detalleegreso[11],
+                            "user_estado": detalleegreso[9],
+                            "user_fecha": detalleegreso[10].strftime('%d/%m/%Y'),
+                            "rol_usuario": {
+                                "rol_idrol": detalleegreso[0],
+                                "rol_nombrerol": detalleegreso[1]
+                                },
+                            "persona": {
+                                "pers_persona": detalleegreso[2],
+                                "pers_email": detalleegreso[3],
+                                "pers_nombres": detalleegreso[4],
+                                "pers_apellidos": detalleegreso[5],
+                                "pers_telefono": detalleegreso[6], 
+                                "pers_direccion": detalleegreso[7]
+                            }
+                        }
+                },
                 "egre_descripcion": detalleegreso[2],
                 "egre_subtotal": detalleegreso[3],
                 "egre_iva": detalleegreso[4],
@@ -559,25 +578,6 @@ class Entities:
     def listDetalleEgresos(self, detaleegresos) -> list:
         return [self.detalleEgresoEntity(detaleegreso) for detaleegreso in detaleegresos]
 
-    @classmethod
-    def documentoEntity1(self, data) -> dict:
-        if data:
-            return {
-                "_id": str(data['_id']),
-                "doc_iddocumento": data['doc_iddocumento'],
-                "tipdoc_id": data['tipdoc_id'],
-                "sec_idsecretario": data['sec_idsecretario'],
-                "doc_descripcion": data['doc_descripcion'],
-                "doc_documento": data['doc_documento'],
-                "doc_entidad": data['doc_entidad'],
-                "doc_recibido": data['doc_recibido']
-            }
-        else:
-            return None
-
-    @classmethod
-    def listDocumentos1(self, documentos) -> list:
-        return [self.documentoEntity(doc) for doc in documentos]
 
     @classmethod
     def reservacionesEntity(self, reservacion) -> dict:
@@ -676,8 +676,8 @@ class Entities:
                 "detres_iva": detres[16],
                 "detres_total": detres[17],
                 "detres_cantidad": detres[18],
-                "detres_horainicio": detres[19],
-                "detres_horafin": detres[20],
+                "detres_horainicio": detres[19].strftime("%H:%M:%S"),
+                "detres_horafin": detres[20].strftime("%H:%M:%S"),
                 "detres_fecha": detres[21],
                 "estado_delete": detres[22]
                 }
@@ -687,265 +687,3 @@ class Entities:
     @classmethod
     def listDetalleReservaciones(self, detalle_reservaciones) -> list:
         return [self.detalleReservacionesEntity(dr) for dr in detalle_reservaciones]
-
-
-
-
-class Rol_Usuario:
-
-    def __init__(self, rol_idrol, rol_nombrerol):
-        self.rol_idrol = rol_idrol
-        self.rol_nombrerol = rol_nombrerol
-
-    def convert_object_json_data(self, data):
-        try:
-            p = Rol_Usuario(data['rol_idrol'], data['rol_nombrerol'])
-            return p
-        except Exception as ex:
-            raise Exception(ex)
-
-    # Convert a json list to person Object
-    def convert_object_list(self, list):
-        try:
-            data = json.loads(list)[0]
-            p = Persona(data['pers_persona'], data['pers_email'], data['pers_nombres'],
-                        data['pers_apellidos'], data['pers_telefono'], data['pers_direccion'])
-            return p
-        except Exception as ex:
-            raise Exception(ex)
-
-    def convert_to_json(self):
-        return {
-            "rol_idrol": self.rol_idrol,
-            "rol_nombrerol": self.rol_nombrerol
-        }
-
-
-class Persona:
-    def __init__(self, pers_persona, pers_email, pers_nombres, pers_apellidos, pers_telefono, pers_direccion):
-        self.pers_persona = pers_persona
-        self.pers_email = pers_email
-        self.pers_nombres = pers_nombres
-        self.pers_apellidos = pers_apellidos
-        self.pers_telefono = pers_telefono
-        self.pers_direccion = pers_direccion
-
-    # Convert a json list to person Object
-    def convert_object_list(self, list):
-        try:
-            data = list[0]
-            p = Persona(data['pers_persona'], data['pers_email'], data['pers_nombres'],
-                        data['pers_apellidos'], data['pers_telefono'], data['pers_direccion'])
-            return p
-        except Exception as ex:
-            raise Exception(ex)
-
-    # convert a json to Persona (Object)
-    def convert_object_json_data(self, data):
-        try:
-            p = Persona(data['pers_persona'], data['pers_email'], data['pers_nombres'],
-                        data['pers_apellidos'], data['pers_telefono'], data['pers_direccion'])
-            return p
-        except Exception as ex:
-            raise Exception(ex)
-
-    def convert_to_json(self):
-        return {
-            "pers_persona": self.pers_persona,
-            "pers_email": self.pers_email,
-            "pers_nombres": self.pers_nombres,
-            "pers_apellidos": self.pers_apellidos,
-            "pers_telefono": self.pers_telefono,
-            "pers_direccion": self.pers_direccion
-        }
-
-
-class User_Usuario:
-
-    def __init__(self, user_iduser, rol_usuario, persona, user_password, user_estado, user_fecha):
-        self.user_idusuario = user_iduser
-        self.rol_usuario = rol_usuario
-        self.persona = persona
-        self.user_password = user_password
-        self.user_estado = user_estado
-        self.user_fecha = user_fecha
-
-    # Convert a json list to person Object
-    def convert_object_list(self, list):
-        try:
-            data = json.loads(list)[0]
-            p = Rol_Usuario(data['user_idusuario'], data['pers_email'], data['pers_nombres'],
-                            data['pers_apellidos'], data['pers_telefono'], data['pers_direccion'])
-            return p
-        except Exception as ex:
-            raise Exception(ex)
-
-    # convert a json to Persona (Object)
-    def convert_object_json_data(self, data):
-        try:
-            p = Persona(data['pers_persona'], data['pers_email'], data['pers_nombres'],
-                        data['pers_apellidos'], data['pers_telefono'], data['pers_direccion'])
-            return p
-        except Exception as ex:
-            raise Exception(ex)
-
-    def convert_to_json(self):
-        return {
-            "user_idusuario": self.user_idusuario,
-            "rol_usuario": self.rol_usuario.convert_to_json(),
-            "persona": self.persona.convert_to_json(),
-            "user_password": self.user_password,
-            "user_estado": self.user_estado,
-            "user_fecha": self.user_fecha
-        }
-        
-        
-    #########################333
-    
-class TipoDocumento:
-    def __init__(self, tipdoc_id, tipdoc_nombre):
-        self.tipdoc_id = tipdoc_id
-        self.tipdoc_nombre = tipdoc_nombre
-    # Convert a json list to person Object
-    def convert_object_list(self, list):
-        try:
-            data = list[0]
-            td = TipoDocumento(data['tipdoc_id'], data['tipdoc_nombre'])
-            return td
-        except Exception as ex:
-            raise Exception(ex)
-
-    # convert a json to Persona (Object)
-    def convert_object_json_data(self, data):
-        try:
-            td = TipoDocumento(data['tipdoc_id'], data['tipdoc_nombre'])
-            return td
-        except Exception as ex:
-            raise Exception(ex)
-
-    def convert_to_json(self):
-        return {
-            "tipdoc_id": self.tipdoc_id,
-            "tipdoc_nombre": self.tipdoc_nombre
-        }
-
-    
-class Documento:
-    def __init__(self, doc_iddocumento, tipdoc_id,sec_idsecretario,doc_descripcion,doc_documento,doc_entidad,doc_recibido):
-        self.doc_iddocumento=doc_iddocumento
-        self.tipdoc_id = tipdoc_id
-        self.sec_idsecretario =sec_idsecretario
-        self.doc_descripcion=doc_descripcion
-        self.doc_documento=doc_documento
-        self.doc_entidad=doc_entidad
-        self.doc_recibido=doc_recibido 
-        
-        
-    # Convert a json list to person Object
-    def convert_object_list(self, list):
-        try:
-            data = list[0]
-            d = Documento(data['doc_iddocumento'], data['tipdoc_id'], data['sec_idsecretario'], data['doc_descripcion'], data['doc_documento'], data['doc_entidad'], data['doc_recibido'])
-            return d
-        except Exception as ex:
-            raise Exception(ex)
-
-    # convert a json to Persona (Object)
-    def convert_object_json_data(self, data):
-        try:
-            d = Documento(data['doc_iddocumento'], data['tipdoc_id'], data['sec_idsecretario'], data['doc_descripcion'], data['doc_documento'], data['doc_entidad'], data['doc_recibido'])
-            return d
-        except Exception as ex:
-            raise Exception(ex)
-
-    def convert_to_json(self):
-        return {
-            "doc_iddocumento":self.doc_iddocumento,
-            "tipdoc_id": self.tipdoc_id,
-            "sec_idsecretario": self.sec_idsecretario,
-            "doc_descripcion": self.doc_descripcion,
-            "doc_documento":self.doc_documento,
-            "doc_entidad":self.doc_entidad,
-            "doc_recibido":self.doc_recibido
-            
-            
-        }
-        
-        
-class Estado_Documento:
-    def __init__(self, estdoc_id, doc_iddocumento,aprobado_presidente,aprobado_entidad,fecha_aprovadopresidente,fecha_aprobadoentidad):
-        self.estdoc_id = estdoc_id
-        self.doc_iddocumento = doc_iddocumento
-        self.aprobado_presidente = aprobado_presidente
-        self.aprobado_entidad=aprobado_entidad        
-        self.fecha_aprovadopresidente = fecha_aprovadopresidente
-        self.fecha_aprobadoentidad=fecha_aprobadoentidad
-    # Convert a json list to person Object
-    def convert_object_list(self, list):
-        try:
-            data = list[0]
-            ed = Estado_Documento(data['estdoc_id'], data['doc_iddocumento'],data['aprobado_presidente'],data['aprobado_entidad'],data['fecha_aprovadopresidente'],data['fecha_aprobadoentidad'])
-            return ed
-        except Exception as ex:
-            raise Exception(ex)
-
-    # convert a json to Persona (Object)
-    def convert_object_json_data(self, data):
-        try:
-             ed = Estado_Documento(data['estdoc_id'], data['doc_iddocumento'],data['aprobado_presidente'],data['aprobado_entidad'],data['fecha_aprovadopresidente'],data['fecha_aprobadoentidad'])
-             return ed
-        except Exception as ex:
-            raise Exception(ex)
-
-    def convert_to_json(self):
-        return {
-            "estdoc_id": self.estdoc_id,
-            "doc_iddocumento": self.doc_idocumento,
-            "aprobado_presidente":self.aprobado_presidente,
-            "aprobado_entidad": self.aprobado_entidad,
-            "fecha_aprovadopresidente":self.fecha_aprovadopresidente,
-            "fecha_aprobadoentidad":self.fecha_aprobadoentidad
-        }
-
-              
-class Reunion:
-    def __init__(self,reun_idreunion, pres_idpresidente,mult_idmulta,reun_fecha,reun_hora,reun_descripcion,reun_quorum,reun_estado,secretario):
-        self.reun_idreunion = reun_idreunion
-        self.pres_idpresidente = pres_idpresidente
-        self.mult_idmulta = mult_idmulta
-        self.reun_fecha=reun_fecha        
-        self.reun_hora = reun_hora
-        self.reun_descripcion=reun_descripcion
-        self.reun_quorum=reun_quorum
-        self.reun_estado=reun_estado
-        self.secretario=secretario
-    # Convert a json list to person Object
-    def convert_object_list(self, list):
-        try:
-            data = list[0]
-            ed = Reunion(data['reun_idreunion'], data['pres_idpresidente'],data[' mult_idmulta'],data['reun_fecha'],data['reun_hora'],data['reun_descripcion'],data['reun_quorum'],data['reun_estado'],data['secretario'] )
-            return ed
-        except Exception as ex:
-            raise Exception(ex)
-
-    # convert a json to Persona (Object)
-    def convert_object_json_data(self, data):
-        try:
-             ed = Reunion(data['reun_idreunion'], data['pres_idpresidente'],data[' mult_idmulta'],data['reun_fecha'],data['reun_hora'],data['reun_descripcion'],data['reun_quorum'],data['reun_estado'],data['secretario'] )
-             return ed
-        except Exception as ex:
-            raise Exception(ex)
-
-    def convert_to_json(self):
-        return {
-            "reun_idreunion": self.reun_idreunion,
-            "pres_idpresidente": self.pres_idpresidente,
-            "mult_idmulta":self.mult_idmulta,
-            "reun_fecha": self.reun_fecha,
-            "reun_hora":self.reun_hora,
-            "reun_descripcion":self.reun_descripcion,
-            "reun_quorum":self.reun_quorum,
-            "reun_estado":self.reun_estado,
-            "secretario":self.secretario
-        }
-        

@@ -112,6 +112,7 @@ class Model:
             raise Exception(ex)
 
     # Personas
+
     @classmethod
     def get_personas(self):
         try:
@@ -169,9 +170,8 @@ class Model:
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:
-                    point = entities.Persona(id_persona, data['pers_email'], data['pers_nombres'],
-                                             data['pers_apellidos'], data['pers_telefono'], data['pers_direccion'])
-                    return point
+                    persona = self.get_persona_byid(id_persona)[0]
+                    return persona
                 else:
                     return {'message': 'Error, Update failed!'}
         except Exception as ex:
@@ -270,7 +270,7 @@ class Model:
                 if row_affects > 0:
                     return {'message': 'User rol deleted successfully!'}
                 else:
-                    return {'message': 'Error, Delete person failed, User rol not found!'}
+                    return {'message': 'Error, Delete rol user failed, User rol not found!'}
         except Exception as ex:
             raise Exception(ex)
 
@@ -406,10 +406,8 @@ class Model:
                 id = u['prefijo']+id_user[4:]
                 user_to_assign = self.get_usuario_byid(id)
                 user = self.get_usuario_byid(id_user)
-                print(user_to_assign, user)
                 if user and user_to_assign[0] is None:
                     pers = user[0]
-                    print(pers['persona'].get('pers_persona'))
                     iduser = ''
                     if int(data['rol_idrol']) == 1:
                         iduser = 'PRE-' + pers['persona'].get('pers_persona')
@@ -444,7 +442,6 @@ class Model:
                             "INSERT INTO condomino(user_idusuario) values('{0}')".format(iduser))
                     rows_affects = cursor.rowcount
                     connection.commit()
-                    print('here')
                     if rows_affects > 0:
                         print(self.create_users(da))
                         user = self.get_usuario_byid(iduser)
@@ -458,7 +455,7 @@ class Model:
     def login(self, username, password):
         try:
             user_found = self.get_usuario_byid(username)
-            if user_found:
+            if user_found[0]:
                 user = user_found[0]
                 check_password = check_password_hash(user['user_password'], password)
                 if check_password and user_found and user['user_estado'] == 0:
@@ -471,348 +468,40 @@ class Model:
                 return None     # Username or password are invalidates
         except Exception as ex:
             return Exception(ex)
-        
-    #############################################################################################
-        
-        #SECRETARIO
-        
-     #Tipo de documento
+
+
     @classmethod
-    def get_tipo_documento(self):
+    def get_detalle_reservaciones(self):
         try:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select td.tipdoc_id, td.tipdoc_nombre from tipo_documento td")
+                "select*from get_detalle_reservaciones gdr")
             result = cursor.fetchall()
             connection.close()
-            tipodocumentos = entities.Entities.listTipoDocumentos(result)
-            return tipodocumentos
+            a = entities.Entities.listDetalleReservaciones(result)
+            return a
         except Exception as ex:
             raise Exception(ex)
 
+
     @classmethod
-    def get_tipodocumento_byid(self, id):
+    def get_detalle_reservaciones_byid(self, id):
         try:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select td.tipdoc_id, td.tipdoc_nombre from tipo_documento td where td.tipdoc_id= {0};".format(id))
+                "select*from get_detalle_reservaciones a where a.detres_iddetalle= {0};".format(id))
             result = cursor.fetchone()
             connection.close()
-            td = [entities.Entities.tipodocumentoEntity(result)]
-            return td
-        except Exception as ex:
-            raise Exception(ex)
-
-    
-    @classmethod
-    def create_tipodocumento(self, data):
-        try:
-            connection = conn.get_connection()
-            with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO tipo_documento(tipdoc_nombre) values('{0}') RETURNING ".format(
-                    data['tipdoc_nombre']))
-                rows_affects = cursor.rowcount
-                id_td = cursor.fetchone()[0]
-                print(rows_affects)
-                connection.commit()
-                if rows_affects > 0:
-                   ##td = entities.TipoDocumento(id_td, data['tipdoc_nombre'])
-                    idd = self.get_tipodocumento_byid(id_td)
-                    return idd
-                else:
-                    return {'message': 'Error, Insert failed!'}
-        except Exception as ex:
-            raise Exception(ex)
-
-    @classmethod
-    def update_tipodocumento(self, id_tipdoc, data):
-        try:
-            connection = conn.get_connection()
-            with connection.cursor() as cursor:
-                cursor.execute("UPDATE tipo_documento SET tipdoc_nombre = '{0}' WHERE tipdoc_id = '{1}'".format(
-                    data['tipdoc_nombre'],id_tipdoc))
-                rows_affects = cursor.rowcount
-                connection.commit()
-                if rows_affects > 0:
-                    point = entities.TipoDocumento(id_tipdoc, data['tipdoc_nombre'])
-                    return point
-                else:
-                    return {'message': 'Error, Update failed!'}
-        except Exception as ex:
-            raise Exception(ex)
-
-    @classmethod
-    def delete_tipodocumento(self, id):
-        try:
-            connection = conn.get_connection()
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    "DELETE FROM tipo_documento WHERE tipdoc_id = '{0}'".format(id))
-                row_affects = cursor.rowcount
-                connection.commit()
-                if row_affects > 0:
-                    return {'message': 'Type Document deleted successfully!'}
-                else:
-                    return {'message': 'Error, Delete type Document failed, Type Document not found!'}
-        except Exception as ex:
-            raise Exception(ex)
-        
-
-        
-     #Documento
-    @classmethod
-    def get_documento(self):
-        try:
-            connection = conn.get_connection()
-            cursor = connection.cursor()
-            cursor.execute(
-                "select doc.doc_iddocumento, doc.tipdoc_id,doc.sec_idsecretario,doc.doc_descripcion,doc.doc_documento,doc.doc_entidad,doc.doc_recibido from documentos doc")
-            result = cursor.fetchall()
-            connection.close()
-            print(result)
-            documentoss = entities.Entities.listDocumentos(result)
-            return documentoss
-        except Exception as ex:
-            raise Exception(ex)
-    
-    @classmethod
-    def get_documento_byid(self, id):
-        try:
-            connection = conn.get_connection()
-            cursor = connection.cursor()
-            cursor.execute(
-                "select doc.doc_iddocumento, doc.tipdoc_id,doc.sec_idsecretario,doc.doc_descripcion,doc.doc_documento,doc.doc_entidad,doc.doc_recibido from documentos doc where doc.doc_iddocumento= {0};".format(id))
-            result = cursor.fetchone()
-            connection.close()
-            td = [entities.Entities.documentoEntity(result)]
-            return td
+            a = [entities.Entities.detalleReservacionesEntity(result)]
+            return a
         except Exception as ex:
             raise Exception(ex)
 
 
-    @classmethod
-    def create_documentos(self, data):
-        try:
-            connection = conn.get_connection()
-            with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO documentos(tipdoc_id,sec_idsecretario,doc_descripcion,doc_documento,doc_entidad,doc_recibido) values('{0}', '{1}','{2}', '{3}','{4}','{5}')".format(
-                    data['tipdoc_id'], data['sec_idsecretario'],data['doc_descripcion'],data['doc_documento'],data['doc_entidad'],data['doc_recibido']))
-                rows_affects = cursor.rowcount
-                id_d = cursor.execute(
-                    "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
-                print(rows_affects)
-                connection.commit()
-                if rows_affects > 0:
-                    d = entities.Documento(id_d,data['tipdoc_id'], data['sec_idsecretario'],data['doc_descripcion'],data['doc_documento'],data['doc_entidad'],data['doc_recibido'])
-                    return d.convert_to_json()
-                else:
-                    return {'message': 'Error, Insert failed!'}
-        except Exception as ex:
-            raise Exception(ex)
+# **************************************************************************************************
 
-    @classmethod
-    def update_documento(self, doc_iddocumento, data):
-        try:
-            connection = conn.get_connection()
-            with connection.cursor() as cursor:
-                cursor.execute("UPDATE documentos SET tipdoc_id = '{0}',sec_idsecretario='{1}',doc_descripcion='{2}',doc_documento='{3}',doc_entidad='{4}',doc_recibido='{5}' WHERE doc_iddocumento = '{6}'".format(
-                    doc_iddocumento))
-                rows_affects = cursor.rowcount
-                connection.commit()
-                if rows_affects > 0:
-                    point = entities.Documento(doc_iddocumento,data['tipdoc_id'], data['sec_idsecretario'],data['doc_descripcion'],data['doc_documento'],data['doc_entidad'],data['doc_recibido'])
-                    return point
-                else:
-                    return {'message': 'Error, Update failed!'}
-        except Exception as ex:
-            raise Exception(ex)
-
-
-
-    @classmethod
-    def delete_documento(self, id):
-        try:
-            connection = conn.get_connection()
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    "DELETE FROM documentos WHERE doc_iddocumento = '{0}'".format(id))
-                row_affects = cursor.rowcount
-                connection.commit()
-                if row_affects > 0:
-                    return {'message': 'Document deleted successfully!'}
-                else:
-                    return {'message': 'Error, Delete type Document failed, Type Document not found!'}
-        except Exception as ex:
-            raise Exception(ex)
-
-     ##estado_documentos   
-    @classmethod
-    def get_estado_documentoTODO(self):
-        try:
-            connection = conn.get_connection()
-            cursor = connection.cursor()
-            cursor.execute(
-                "select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed")
-            result = cursor.fetchall()
-            connection.close()
-            eds = entities.Entities.listEstadoDocumentos(result)
-            return eds
-        except Exception as ex:
-            raise Exception(ex)
-        
-    @classmethod
-    def get_estado_documentoTRUE(self):
-        try:
-            connection = conn.get_connection()
-            cursor = connection.cursor()
-            cursor.execute("select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed where ed.aprobado_presidente=1")
-            result = cursor.fetchall()
-            connection.close()
-            eds = entities.Entities.listEstadoDocumentos(result)
-            return eds
-        except Exception as ex:
-            raise Exception(ex)
-    @classmethod    
-    def get_estado_documentoFALSE(self):
-        try:
-            connection = conn.get_connection()
-            cursor = connection.cursor()
-            cursor.execute(
-                          "select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed where ed.aprobado_presidente=0")
-            result = cursor.fetchall()
-            connection.close()
-            eds = entities.Entities.listEstadoDocumentos(result)
-            return eds
-        except Exception as ex:
-            raise Exception(ex)
-    
-    
-
-    
-    @classmethod
-    def get_estado_documento_byid(self, id):
-        try:
-            connection = conn.get_connection()
-            cursor = connection.cursor()
-            cursor.execute(
-                         "select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed where ed.estdoc_id={0};".format(id))
-            result = cursor.fetchone()
-            connection.close()
-            td = [entities.Entities.estado_documentosEntity(result)]
-            return td
-        except Exception as ex:
-            raise Exception(ex)
-
-    @classmethod
-    def create_estado_documento(self, data):
-        try:
-            connection = conn.get_connection()
-            with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO estado_documentos(doc_iddocumento,aprobado_presidente,aprobado_entidad,fecha_aprovadopresidente,fecha_aprobadoentidad) values('{0}','{1}','{2}','{3}','{4}')".format(
-                    data['doc_iddocumento'],data['aprobado_presidente'],data['aprobado_entidad'],data['fecha_aprovadopresidente'],data['fecha_aprobadoentidad']))
-                rows_affects = cursor.rowcount
-                id_ed = cursor.execute(
-                    "SELECT @@IDENTITY AS 'Identity'").fetchone()[0]
-                print(rows_affects)
-                connection.commit()
-                if rows_affects > 0:
-                   ##td = entities.TipoDocumento(id_td, data['tipdoc_nombre'])
-                    idd = self.get_estado_documento_byid(id_ed)
-                    return idd
-                else:
-                    return {'message': 'Error, Insert failed!'}
-        except Exception as ex:
-            raise Exception(ex)
-
-
-##reunion  
-    @classmethod
-    def get_reunion(self):
-        try:
-            connection = conn.get_connection()
-            cursor = connection.cursor()
-            cursor.execute(
-                "select * from get_reuniones r")
-            result = cursor.fetchall()
-            connection.close()
-            reuniones = entities.Entities.listReunion(result)
-            return reuniones
-        except Exception as ex:
-            raise Exception(ex)
-
-    @classmethod
-    def get_reunion_byid(self, id):
-        try:
-            connection = conn.get_connection()
-            cursor = connection.cursor()
-            cursor.execute(
-                "select * from get_reuniones r where r.reun_idreunion={0};".format(id))
-            result = cursor.fetchone()
-            connection.close()
-            td = [entities.Entities.reunionEntity(result)]
-            return td
-        except Exception as ex:
-            raise Exception(ex)
-
-  
-    @classmethod
-    def create_reunion(self, data):
-        try:
-            connection = conn.get_connection()
-            with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO reunion(pres_idpresidente,mult_idmulta,reun_fecha,reun_hora,reun_descripcion,reun_quorum,reun_estado,secretario) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}') RETURNING reun_idreunion".format(
-                   data['reun_idreunion'], data['pres_idpresidente'],data[' mult_idmulta'],data['reun_fecha'],data['reun_hora'],data['reun_descripcion'],data['reun_quorum'],data['reun_estado'],data['secretario'] ))
-                rows_affects = cursor.rowcount
-                id_td = cursor.fetchone()[0]
-                print(rows_affects)
-                connection.commit()
-                if rows_affects > 0:
-                   ##td = entities.TipoDocumento(id_td, data['tipdoc_nombre'])
-                    idd = self.get_reunion_byid(id_td)
-                    return idd
-                else:
-                    return {'message': 'Error, Insert failed!'}
-        except Exception as ex:
-            raise Exception(ex)
-
-    @classmethod
-    def update_reunion(self, id_reunion, data):
-        try:
-            connection = conn.get_connection()
-            with connection.cursor() as cursor:
-                cursor.execute("UPDATE reunion SET pres_idpresidente = '{0}',mult_idmulta = '{1}',reun_fecha = '{2}',reun_hora = '{3}',reun_descripcion = '{4}',reun_quorum = '{5}',reun_estado = '{6}',secretario = '{7}', WHERE reun_idreunion = '{8}'".format(
-                    data['pres_idpresidente'],data[' mult_idmulta'],data['reun_fecha'],data['reun_hora'],data['reun_descripcion'],data['reun_quorum'],data['reun_estado'],data['secretario'],id_reunion))
-                rows_affects = cursor.rowcount
-                connection.commit()
-                if rows_affects > 0:
-                    point = entities.Reunion(id_reunion,   data['pres_idpresidente'],data[' mult_idmulta'],data['reun_fecha'],data['reun_hora'],data['reun_descripcion'],data['reun_quorum'],data['reun_estado'],data['secretario'])
-                    return point
-                else:
-                    return {'message': 'Error, Update failed!'}
-        except Exception as ex:
-            raise Exception(ex)
-
-    @classmethod
-    def delete_reunion(self, id):
-        try:
-            connection = conn.get_connection()
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    "DELETE FROM reunion WHERE reun_idreunion = '{0}'".format(id))
-                row_affects = cursor.rowcount
-                connection.commit()
-                if row_affects > 0:
-                    return {'message': 'Type Document deleted successfully!'}
-                else:
-                    return {'message': 'Error, Delete type Document failed, Type Document not found!'}
-        except Exception as ex:
-            raise Exception(ex)
-        
-  ##---------------------Yo------------------------------------
-  ##--------------Multas----------
-  ##-----get
     @classmethod
     def get_multas(self):
             try:
@@ -972,7 +661,7 @@ class Model:
                     return {'message': 'Error, Update failed!'}
         except Exception as ex:
             raise Exception(ex)
-    
+
 
     @classmethod
     def delete_tipoDocumentos(self, id):
@@ -1084,7 +773,7 @@ class Model:
 
      ##-----get Servicios
     @classmethod
-    def get_servicio(self):
+    def get_servicios(self):
             try:
                 connection = conn.get_connection()
                 cursor = connection.cursor()
@@ -1106,9 +795,9 @@ class Model:
             cursor = connection.cursor()
             cursor.execute(
                 "select * from get_servicios s where s.serv_idservicios= {0};".format(id))
-            result = cursor.fetchall()
+            result = cursor.fetchone()
+            serv = [entities.Entities.serviciosEntity(result)]
             connection.close()
-            serv = entities.Entities.listServicios(result)
             return serv
         except Exception as ex:
             raise Exception(ex)
@@ -1227,7 +916,7 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE reservaciones SET serv_idservicios = '{0}', resv_fecha = '{1}', resv_descripcion = '{2}' WHERE rol_idrol = '{3}'".format(
+                cursor.execute("UPDATE reservaciones SET serv_idservicios = '{0}', resv_fecha = '{1}', resv_descripcion = '{2}' WHERE resv_idreservacion = '{3}'".format(
                     data['serv_idservicios'], data['resv_fecha'], data['resv_descripcion'], id_rol))
                 rows_affects = cursor.rowcount
                 connection.commit()
@@ -1261,7 +950,7 @@ class Model:
     ##------------------------ALICUOTA ACTUALIZADA--------------------
      ## get alicuota actualizada
     @classmethod
-    def get_alicuotaActualizada(self):
+    def get_alicuotaActualizadas(self):
         try:
             connection = conn.get_connection()
             cursor = connection.cursor()
@@ -1290,15 +979,13 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
     
-    ##create alicuota actualizada////errorrrrrrr
 
     @classmethod
     def create_alicuotaActualizada(self, data):
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO alicuota_actualizada( alic_valor, alic_fecha ) values('{0}', '{1}')".format(
-                data['alic_valor'], data['alic_fecha']))
+                cursor.execute("INSERT INTO alicuota_actualizada(alic_idalicuota, alic_valor, alic_fecha) values({0}, {1}, '{2}') RETURNING alic_id".format(data['alic_idalicuota'], data['alic_valor'], data['alic_fecha']))
                 rows_affects = cursor.rowcount
                 id_ac = cursor.fetchone()[0]
                 connection.commit()
@@ -1317,7 +1004,7 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE alicuota_actualizada SET alic_idalicuota = '{0}', alic_valor = '{1}', alic_fecha = '{3}' WHERE alic_id = '{3}'".format(
+                cursor.execute("UPDATE alicuota_actualizada SET alic_idalicuota = {0}, alic_valor = {1}, alic_fecha = '{2}' WHERE alic_id = '{3}'".format(
                     data['alic_idalicuota'], data['alic_valor'], data['alic_fecha'], id_rol))
                 rows_affects = cursor.rowcount
                 connection.commit()
@@ -1347,31 +1034,248 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
+
+
+    # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+    #SECRETARIO
+
+    # Documento
     @classmethod
-    def get_detalle_reservaciones(self):
+    def get_documentos(self):
         try:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select*from get_detalle_reservaciones gdr")
+                "select * from get_documentos doc")
             result = cursor.fetchall()
             connection.close()
-            a = entities.Entities.listDetalleReservaciones(result)
-            return a
+            documentos = entities.Entities.listDocumentos(result)
+            return documentos
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def get_documento_byid(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_documentos doc where doc.doc_iddocumento = {0}".format(id))
+            result = cursor.fetchone()
+            connection.close()
+            documentos = [entities.Entities.documentoEntity(result)]
+            return documentos
         except Exception as ex:
             raise Exception(ex)
 
 
     @classmethod
-    def get_detalle_reservaciones_byid(self, id):
+    def create_documentos(self, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("INSERT INTO documentos(tipo_documento,sec_idsecretario,doc_descripcion,doc_documento,doc_entidad,doc_recibido) values('{0}', '{1}','{2}', '{3}','{4}','{5}') RETURNING doc_iddocumento".format(
+                    data['tipdoc_id'], data['sec_idsecretario'],data['doc_descripcion'],data['doc_documento'],data['doc_entidad'],data['doc_recibido']))
+                rows_affects = cursor.rowcount
+                id_d = cursor.fetchone()[0]
+                connection.commit()
+                if rows_affects > 0:
+                    d = self.get_documento_byid(id_d)
+                    return d
+                else:
+                    return {'message': 'Error, Insert failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def update_documento(self, doc_iddocumento, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE documentos SET tipo_documento = '{0}',sec_idsecretario='{1}',doc_descripcion='{2}',doc_documento='{3}',doc_entidad='{4}',doc_recibido='{5}' WHERE doc_iddocumento = '{6}'".format(data['tipdoc_id'], data['sec_idsecretario'], data['doc_descripcion'], data['doc_documento'], data['doc_entidad'], data['doc_recibido'], doc_iddocumento))
+                rows_affects = cursor.rowcount
+                connection.commit()
+                if rows_affects > 0:
+                    d = self.get_documento_byid(doc_iddocumento)
+                    return d
+                else:
+                    return {'message': 'Error, Update failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+
+
+    @classmethod
+    def delete_documento(self, id):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM documentos WHERE doc_iddocumento = '{0}'".format(id))
+                row_affects = cursor.rowcount
+                connection.commit()
+                if row_affects > 0:
+                    return {'message': 'Document deleted successfully!'}
+                else:
+                    return {'message': 'Error, Delete type Document failed, Type Document not found!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+     ##estado_documentos   
+    @classmethod
+    def get_estado_documentoTODO(self):
         try:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select*from get_detalle_reservaciones a where a.resv_idreservacion= {0};".format(id))
+                "select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed")
+            result = cursor.fetchall()
+            connection.close()
+            eds = entities.Entities.listEstadoDocumentos(result)
+            return eds
+        except Exception as ex:
+            raise Exception(ex)
+        
+    @classmethod
+    def get_estado_documentoTRUE(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute("select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed where ed.aprobado_presidente=1")
+            result = cursor.fetchall()
+            connection.close()
+            eds = entities.Entities.listEstadoDocumentos(result)
+            return eds
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod    
+    def get_estado_documentoFALSE(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                          "select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed where ed.aprobado_presidente=0")
+            result = cursor.fetchall()
+            connection.close()
+            eds = entities.Entities.listEstadoDocumentos(result)
+            return eds
+        except Exception as ex:
+            raise Exception(ex)
+    
+    
+
+    
+    @classmethod
+    def get_estado_documento_byid(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                         "select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed where ed.estdoc_id={0};".format(id))
             result = cursor.fetchone()
             connection.close()
-            a = [entities.Entities.alicuota_actualizadaEntity(result)]
-            return a
+            td = [entities.Entities.estado_documentosEntity(result)]
+            return td
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def create_estado_documento(self, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("INSERT INTO estado_documentos(doc_iddocumento,aprobado_presidente,aprobado_entidad,fecha_aprovadopresidente,fecha_aprobadoentidad) values('{0}','{1}','{2}','{3}','{4}') returning estdoc_id".format(
+                    data['doc_iddocumento'],data['aprobado_presidente'],data['aprobado_entidad'],data['fecha_aprovadopresidente'],data['fecha_aprobadoentidad']))
+                rows_affects = cursor.rowcount
+                id_ed = cursor.fetchone()[0]
+                connection.commit()
+                if rows_affects > 0:
+                    idd = self.get_estado_documento_byid(id_ed)
+                    return idd
+                else:
+                    return {'message': 'Error, Insert failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+
+##reunion  
+    @classmethod
+    def get_reunion(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_reuniones r")
+            result = cursor.fetchall()
+            connection.close()
+            reuniones = entities.Entities.listReunion(result)
+            return reuniones
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def get_reunion_byid(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_reuniones r where r.reun_idreunion={0};".format(id))
+            result = cursor.fetchone()
+            connection.close()
+            td = [entities.Entities.reunionEntity(result)]
+            return td
+        except Exception as ex:
+            raise Exception(ex)
+
+  
+    @classmethod
+    def create_reunion(self, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("INSERT INTO reunion(pres_idpresidente,mult_idmulta,reun_fecha,reun_hora,reun_descripcion,reun_quorum,reun_estado,secretario) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}') RETURNING reun_idreunion".format(
+                   data['reun_idreunion'], data['pres_idpresidente'],data[' mult_idmulta'],data['reun_fecha'],data['reun_hora'],data['reun_descripcion'],data['reun_quorum'],data['reun_estado'],data['secretario'] ))
+                rows_affects = cursor.rowcount
+                id_td = cursor.fetchone()[0]
+                connection.commit()
+                if rows_affects > 0:
+                    idd = self.get_reunion_byid(id_td)
+                    return idd
+                else:
+                    return {'message': 'Error, Insert failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def update_reunion(self, id_reunion, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE reunion SET pres_idpresidente = '{0}',mult_idmulta = '{1}',reun_fecha = '{2}',reun_hora = '{3}',reun_descripcion = '{4}',reun_quorum = '{5}',reun_estado = '{6}',secretario = '{7}', WHERE reun_idreunion = '{8}'".format(
+                    data['pres_idpresidente'],data[' mult_idmulta'],data['reun_fecha'],data['reun_hora'],data['reun_descripcion'],data['reun_quorum'],data['reun_estado'],data['secretario'],id_reunion))
+                rows_affects = cursor.rowcount
+                connection.commit()
+                if rows_affects > 0:
+                    r = self.get_reunion_byid(id_reunion)
+                    return r
+                else:
+                    return {'message': 'Error, Update failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def delete_reunion(self, id):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM reunion WHERE reun_idreunion = '{0}'".format(id))
+                row_affects = cursor.rowcount
+                connection.commit()
+                if row_affects > 0:
+                    return {'message': 'Type Document deleted successfully!'}
+                else:
+                    return {'message': 'Error, Delete type Document failed, Type Document not found!'}
         except Exception as ex:
             raise Exception(ex)
