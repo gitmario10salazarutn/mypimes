@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Python Flask MongoDB Upload File and validate before save to Database </h2>
+    <h3>Select a file to upload</h3>
+    <p>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+    <div class="alert alert-primary">
+        <strong>{{ message }}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    </p>
+    <form method="post" action="/upload" enctype="multipart/form-data">
+        <p>doc_descripcion : <input type="text" name="doc_descripcion" value="" placeholder="doc_descripcion" required> </p>
+        <p>doc_entidad : <input type="text" name="doc_entidad" value="" placeholder="doc_entidad" required> </p>
+        <p>doc_recibido : <input type="text" name="doc_recibido" placeholder="doc_recibido" required></p>
+        <p>estado_delete : <input type="text" name="estado_delete" value="" placeholder="estado_delete" required> </p>
+        <p>sec_idsecretario : <input type="text" name="sec_idsecretario" placeholder="sec_idsecretario" required></p>
+        <p>tipdoc_id : <input type="text" name="tipdoc_id" placeholder="tipdoc_id" required></p>
+        <p>
+            <input type="file" name="inputFile" autocomplete="off" required onchange="loadFile(event)">
+        </p>
+        <p>
+            <input type="submit" value="Submit">
+        </p>
+    </form>
+    <img id="output" width="500" />
+    <script>
+        var loadFile = function (event) {
+            var output = document.getElementById('output');
+            output.src = URL.createObjectURL(event.target.files[0]);
+            output.onload = function () {
+                URL.revokeObjectURL(output.src)
+            }
+        };
+    </script>
+    
+    <style>
+        .alert-primary {
+            color: #004085;
+            background-color: #cce5ff;
+            border-color: #b8daff;
+        }
+    
+        .alert {
+            position: relative;
+            padding: .75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: .25rem;
+        }
+    </style>
+</body>
+</html>

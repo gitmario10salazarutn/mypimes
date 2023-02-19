@@ -5,12 +5,18 @@ Created on Tue Oct 11 22:55:25 2022
 @author: Mario
 """
 from flask_cors import CORS
-from flask import jsonify, request
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template, flash, redirect, url_for
+from flask_mongoengine import MongoEngine
+from werkzeug.utils import secure_filename
+import os
+import urllib.request
 from config import config
 from models import Models as model
+from database import connectdb as conn
+import gridfs
 
 main = Flask(__name__)
+main.secret_key = "mario10salazar"
 CORS(main)
 
 @main.route('/get_user_byid/<id_user>', methods=['GET'])
@@ -1476,15 +1482,119 @@ def delete_reunion(id_reunion):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
+# **************************************************************************************************
+import pathlib
+UPLOAD_FOLDER = 'docs/'
+main.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+main.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+mongo = conn.get_connectionMongoDB().db
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@main.route('/upload', methods=['POST'])
+def upload():
+    file = request.files['inputFile']
+    doc_descripcion = request.form['doc_descripcion']
+    doc_documento = file.filename
+    doc_entidad = request.form['doc_entidad']
+    doc_recibido = request.form['doc_recibido']
+    estado_delete = request.form['estado_delete']
+    sec_idsecretario = request.form['sec_idsecretario']
+    tipdoc_id = request.form['tipdoc_id']
+    data = 	{
+		"doc_descripcion": doc_descripcion,
+		"doc_documento": file.filename,
+		"doc_entidad": doc_entidad,
+		"doc_recibido": doc_recibido,
+		"estado_delete": estado_delete,
+		"sec_idsecretario": sec_idsecretario,
+		"tipdoc_id": tipdoc_id
+	}
+    doc = model.Model.create_documentos(data)[0]
+    id_doc = doc.get('doc_iddocumento')
+    filename = secure_filename(file.filename)
+    if file and allowed_file(file.filename):
+        file.save(os.path.join(main.config['UPLOAD_FOLDER'], filename))
+        file_loc = os.path.join(main.config['UPLOAD_FOLDER'], filename)
+        docs = mongo['test.files']
+        fs = gridfs.GridFS(mongo, collection="test")
+        upload_file(file_loc=file_loc, file_name=file.filename, fs=fs, doc_descripcion = doc_descripcion,
+                                        doc_documento = file.filename,
+                                        doc_entidad = doc_entidad,
+                                        doc_recibido = doc_recibido,
+                                        estado_delete = estado_delete,
+                                        sec_idsecretario = sec_idsecretario,
+                                        tipdoc_id = tipdoc_id,
+                                        doc_iddocumento = id_doc)
+        flash('File successfully uploaded ' + file.filename + ' to the database!')
+        return redirect('/')
+    else:
+        flash('Invalid Uplaod only txt, pdf, png, jpg, jpeg, gif') 
+    return redirect('/')
+
+def upload_file(file_loc, file_name, fs, doc_descripcion,
+                                        doc_documento,
+                                        doc_entidad,
+                                        doc_recibido,
+                                        estado_delete,
+                                        sec_idsecretario,
+                                        tipdoc_id, doc_iddocumento):
+    """upload file to mongodb"""
+    print(file_loc)
+    with open(file_loc, 'rb') as file_data:
+        data = file_data.read()
+    # put file into mongodb
+    fs.put(data, filename=file_name, doc_descripcion = doc_descripcion,
+                                        doc_documento = doc_documento,
+                                        doc_entidad = doc_entidad,
+                                        doc_recibido = doc_recibido,
+                                        estado_delete = estado_delete,
+                                        sec_idsecretario = sec_idsecretario,
+                                        tipdoc_id = tipdoc_id,
+                                        doc_iddocumento = doc_iddocumento)
+    print("Upload Complete")
+
+
+def download_file(download_loc, db, fs, id_doc):
+    """download file from mongodb"""
+    data = db.test.files.find_one({"doc_iddocumento": id_doc})
+    print(data)
+    
+    fs_id = data['_id']
+    out_data = fs.get(fs_id).read()
+
+    with open(download_loc, 'wb') as output:
+        output.write(out_data)
+    
+    print("Download Completed!")
+
+# **************************************************************************************************
+
 def Page_Not_Found(error):
     return '<h1>Page Not Found</h1>', 404
 
 
 @main.route('/')
 def index():
-    return '<h1>Hi, I am Mario and Who are you?</h1>'
+    return render_template('index.html')
 
+file_name = "Google Cloud-Preguntas.pdf"
+file_loc = "C:/Users/Mario/Downloads/" + file_name
+down_loc = os.path.join(os.getcwd() + "/downloads/", file_name)
+    
+fs = gridfs.GridFS(mongo, collection="test")
+
+# upload file
+#upload_file(file_loc=file_loc, file_name=file_name, fs=fs)
+# download file
+print(fs)
+download_file(down_loc, mongo, fs, 51)
 
 if __name__ == '__main__':
     main.register_error_handler(404, Page_Not_Found)
     main.run(debug = True, host = "0.0.0.0")
+

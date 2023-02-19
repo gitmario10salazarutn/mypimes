@@ -53,6 +53,7 @@ def connect_MongoDB(username, password, database):
         app = Flask(__name__)
         app.config["MONGO_URI"] = "mongodb://{0}:{1}@{2}/{3}".format(username, password, hostnae, database) # "mongodb+srv://{0}:{1}@{2}/{3}".format(username, password, hostname, database)
         mongo = PyMongo(app)
+        print(app.config["MONGO_URI"])
         if mongo.db.with_options is not None:
             return mongo
         else:
@@ -86,13 +87,15 @@ def get_connection():
         return connection
     except Exception as ex:
         raise ex
-"""
+
 
 a = get_connection()
 a = a.cursor()
-a.execute("select * from detalle_reservaciones dr")
+a.execute("select * from documentos")
 row = a.fetchall()
 for p in row:
     print(p)
 
-"""
+
+
+get_connectionMongoDB()
