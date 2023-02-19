@@ -505,7 +505,7 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("insert into detalle_reservaciones (reservacion, sec_idsecretario, condomino, detres_subtotal, detres_iva, detres_total, detres_cantidad, detres_horainicio, detres_horafin, detres_fecha, estado_delete_detres) values({0}, {1}, {2}, {3}, {4}, {5}, {6}, '{7}', '{8}', '{9}', '{10}') returning detres_iddetalle;".format(data['reservacion'], data['sec_idsecretario'], data['condomino'], data['detres_subtotal'], data['detres_iva'], data['detres_total'], data['detres_cantidad'], data['detres_horainicio'], data['detres_horafin'], data['detres_fecha'], data['estado_delete_detres']))
+                cursor.execute("insert into detalle_reservaciones (reservacion, detres_subtotal, detres_iva, detres_total, detres_cantidad, detres_horainicio, detres_horafin, detres_fecha, estado_delete_detres, detres_cabreservacion) values({0}, {1}, {2}, {3}, {4}, '{5}', '{6}', '{7}', '{8}', {9}) returning detres_iddetalle;".format(data['reservacion'], data['detres_subtotal'], data['detres_iva'], data['detres_total'], data['detres_cantidad'], data['detres_horainicio'], data['detres_horafin'], data['detres_fecha'], data['estado_delete_detres'], data['detres_cabreservacion']))
                 rows_affects = cursor.rowcount
                 id = cursor.fetchone()[0]
                 connection.commit()
@@ -522,14 +522,14 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE detalle_reservaciones SET reservacion = {0}, sec_idsecretario = {1}, condomino = {2}, detres_subtotal = {3}, detres_iva = {4}, detres_total = {5}, detres_cantidad = {6}, detres_horainicio = '{7}', detres_horafin = '{8}', detres_fecha = '{9}', estado_delete_detres = '{10}' WHERE detres_iddetalle = {11}".format(data['reservacion'], data['sec_idsecretario'], data['condomino'], data['detres_subtotal'], data['detres_iva'], data['detres_total'], data['detres_cantidad'], data['detres_horainicio'], data['detres_horafin'], data['detres_fecha'], data['estado_delete_detres'], id))
+                cursor.execute("UPDATE detalle_reservaciones SET reservacion = {0}, detres_subtotal = {1}, detres_iva = {2}, detres_total = {3}, detres_cantidad = {4}, detres_horainicio = '{5}', detres_horafin = '{6}', detres_fecha = '{7}', estado_delete_detres = '{8}', detres_cabreservacion = {9} WHERE detres_iddetalle = {10}".format(data['reservacion'], data['detres_subtotal'], data['detres_iva'], data['detres_total'], data['detres_cantidad'], data['detres_horainicio'], data['detres_horafin'], data['detres_fecha'], data['estado_delete_detres'], data['detres_cabreservacion'], id))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:
                     a   = self.get_detalle_reservaciones_byid(id)[0]
                     return a
                 else:
-                    return {'message': 'Error, Update failed!'}
+                    return None
         except Exception as ex:
             raise Exception(ex)
 
@@ -660,7 +660,7 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select * from get_pago_alicuotas p where p.pagali_id = {0};".format(id))
+                "select * from get_pago_alicuotas p where p.pagali_id_gpa = {0};".format(id))
             result = cursor.fetchone()
             connection.close()
             person = [entities.Entities.pago_alicuotaEntity(result)]
@@ -669,11 +669,13 @@ class Model:
             raise Exception(ex)
 
     @classmethod
-    def create_pago_alicuota(self, data):
+    def create_pago_alicuota(self, subtotal, iva, total, data):
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("insert into pago_alicuota (tes_idtesorero, cond_idcondomino, pagali_fecha, pagali_numero, pagali_subtotal, pagali_iva, pagali_total, estado_delete_pagali)  values({0}, {1}, '{2}', '{3}', {4}, {5}, {6}, '{7}') returning pagali_id".format(data['tes_idtesorero'], data['cond_idcondomino'], data['pagali_fecha'], data['pagali_numero'], data['pagali_subtotal'], data['pagali_iva'], data['pagali_total'], data['estado_delete_pagali']))
+                f = datetime.now()
+                fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
+                cursor.execute("insert into pago_alicuota (tes_idtesorero, cond_idcondomino, pagali_fecha, pagali_numero, pagali_subtotal, pagali_iva, pagali_total, estado_delete_pagali)  values({0}, {1}, '{2}', '{3}', {4}, {5}, {6}, '{7}') returning pagali_id".format(data['tes_idtesorero'], data['cond_idcondomino'],fecha, data['pagali_numero'], subtotal, iva, total, 'False'))
                 rows_affects = cursor.rowcount
                 id = cursor.fetchone()[0]
                 connection.commit()
@@ -697,7 +699,7 @@ class Model:
                     a   = self.get_pago_alicuota_byid(id)[0]
                     return a
                 else:
-                    return {'message': 'Error, Update failed!'}
+                    return None
         except Exception as ex:
             raise Exception(ex)
 
@@ -721,7 +723,6 @@ class Model:
 # **************************************************************************************************
 
     # Detalle Pago
-
 
     @classmethod
     def get_detalle_pagos(self):
@@ -827,7 +828,7 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select * from get_egresos p where p.egre_id = {0};".format(id))
+                "select * from get_egresos p where p.egre_id_ge = {0};".format(id))
             result = cursor.fetchone()
             connection.close()
             dp = [entities.Entities.egresosEntity(result)]
@@ -836,11 +837,26 @@ class Model:
             raise Exception(ex)
 
     @classmethod
-    def create_egreso(self, data):
+    def getCountEgresos(self):
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("insert into egresos (tes_idtesorero, egre_descripcion, egre_subtotal, egre_iva, egre_total, egre_fecha,egre_numero, estado_delete_egr)  values({0}, '{1}', {2}, {3}, {4}, '{5}', '{6}', '{7}') returning egre_id".format(data['tes_idtesorero'], data['egre_descripcion'], data['egre_subtotal'], data['egre_iva'], data['egre_total'], data['egre_fecha'], data['egre_numero'], data['estado_delete_egr']))
+                
+                cursor.execute("select max(cr.egre_id) from egresos cr ;")
+                num = cursor.fetchone()[0]
+                return num
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def create_egreso(self,subtotal, iva, total, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                numero = self.getCountEgresos() + 1
+                f = datetime.now()
+                fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
+                cursor.execute("insert into egresos (tes_idtesorero, egre_descripcion, egre_subtotal, egre_iva, egre_total, egre_fecha,egre_numero, estado_delete_egr)  values({0}, '{1}', {2}, {3}, {4}, '{5}', '{6}', '{7}') returning egre_id".format(data['tes_idtesorero'], data['egre_descripcion'], subtotal, iva, total, fecha, numero, 'False'))
                 rows_affects = cursor.rowcount
                 id = cursor.fetchone()[0]
                 connection.commit()
@@ -965,6 +981,185 @@ class Model:
                     return {'message': 'Detalle Egreso deleted successfully!'}
                 else:
                     return {'message': 'Error, Delete Detalle Egreso failed, Egreso not found!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+
+# **************************************************************************************************
+
+    # Cabecera Reservaciones
+
+    @classmethod
+    def get_cabecera_reservaciones(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute("select * from get_cabreservaciones gc;")
+            result = cursor.fetchall()
+            connection.close()
+            dp = entities.Entities.listCabeceraReservaciones(result)
+            return dp
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def get_cabecera_reservacion_byid(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_cabreservaciones p where p.id_cabreservacion = {0};".format(id))
+            result = cursor.fetchone()
+            connection.close()
+            dp = [entities.Entities.cabeceraRecervacionesEntity(result)]
+            return dp
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def getCountReservaciones(self):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                
+                cursor.execute("select max(cr.id_cabreservacion) from cabecera_reservacion cr ;")
+                num = cursor.fetchone()[0]
+                return num
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def create_cabecera_reservacion(self,subtotal, iva, total, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                numero = self.getCountReservaciones() + 1
+                f = datetime.now()
+                fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
+                cursor.execute("insert into cabecera_reservacion (cabres_secretario, cabres_condomino, cabres_subtotal, cabres_iva, cabres_total, cabres_numero, cabres_fecha) values({0}, {1}, {2}, {3}, {4}, '{5}', '{6}') returning id_cabreservacion;".format(data['cabres_secretario'], data['cabres_condomino'], subtotal, iva, total, numero, fecha))
+                rows_affects = cursor.rowcount
+                id = cursor.fetchone()[0]
+                connection.commit()
+                if rows_affects > 0:
+                    a = self.get_cabecera_reservacion_byid(id)
+                    return a
+                else:
+                    return {'message': 'Error, Insert failed!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def update_cabecera_reservacion(self, id, data):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE cabecera_reservacion SET cabres_secretario = {0}, cabres_condomino = {1}, cabres_subtotal = {2}, cabres_iva = {3}, cabres_total = {4}, cabres_numero = '{5}', cabres_fecha = '{6}' WHERE id_cabreservacion = {7}".format(data['cabres_secretario'], data['cabres_condomino'], data['cabres_subtotal'], data['cabres_iva'], data['cabres_total'], data['cabres_numero'], data['cabres_fecha'], id))
+                rows_affects = cursor.rowcount
+                connection.commit()
+                if rows_affects > 0:
+                    a   = self.get_cabecera_reservacion_byid(id)[0]
+                    return a
+                else:
+                    return None
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def delete_cabecera_reservacion(self, id):
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM cabecera_reservacion WHERE id_cabreservacion = '{0}'".format(id))
+                row_affects = cursor.rowcount
+                connection.commit()
+                if row_affects > 0:
+                    return {'message': 'Cabecera reservacion deleted successfully!'}
+                else:
+                    return {'message': 'Error, Delete Cabecera reservacion failed, Cabecera reservacion not found!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+# **************************************************************************************************
+
+    @classmethod
+    def add_detail_reserv(self, data, list_det_reserv: list) -> list:
+        try:
+            if data:
+                dr = []
+                reservacion = self.get_reservaciones_byid(data['reservacion'])
+                serv_valor = reservacion[0].get('servicios').get('serv_valor')
+                serv_iva = reservacion[0].get('servicios').get('serv_iva')
+                dr.append(data['reservacion'])
+                dr.append(None)
+                total = data['cantidad'] * serv_valor
+                subtotal = total / ((100 + serv_iva)/100)
+                iva = total - subtotal
+                f = datetime.now()
+                fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
+                dr.append(subtotal)
+                dr.append(iva)
+                dr.append(total)
+                dr.append(data['cantidad'])
+                dr.append(data['hora_inicio'])
+                dr.append(data['hora_fin'])
+                dr.append(fecha)
+                dr.append('False')
+                list_det_reserv.append(entities.Entities.Detalle_Reservaciones(dr))
+                return list_det_reserv
+            else:
+                return None
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def add_detail_pago(self, data, list_det_pago: list) -> list:
+        try:
+            if data:
+                dr = []
+                ali_act = self.get_alicuotaActualizada_byid(data['aliact_id'])
+                alic_valor = ali_act[0].get('alicuota').get('ali_valor_actual')
+                dr.append(None)
+                dr.append(data['aliact_id'])
+                total = float(alic_valor)
+                subtotal = total / ((100 + 12)/100)
+                iva = total - subtotal
+                f = datetime.now()
+                fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
+                dr.append(subtotal)
+                dr.append(iva)
+                dr.append(total)
+                dr.append(fecha)
+                dr.append(data['detpag_multa'])
+                dr.append('False')
+                list_det_pago.append(entities.Entities.Detalle_Pago(dr))
+                return list_det_pago
+            else:
+                return None
+        except Exception as ex:
+            raise Exception(ex)
+
+
+    @classmethod
+    def add_detail_egreso(self, data, list_det_egreso: list) -> list:
+        try:
+            if data:
+                dr = []
+                dr.append(None)
+                dr.append(data['detegre_numerofactura'])
+                f = datetime.now()
+                fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
+                dr.append(data['detegre_valorfactura'])
+                dr.append(data['deteegre_documento'])
+                dr.append(data['detegre_subtotal'])
+                dr.append(data['detegre_iva'])
+                dr.append(data['detegre_total'])
+                dr.append(fecha)
+                dr.append('False')
+                list_det_egreso.append(entities.Entities.Detalle_Egreso(dr))
+                return list_det_egreso
+            else:
+                return None
         except Exception as ex:
             raise Exception(ex)
 

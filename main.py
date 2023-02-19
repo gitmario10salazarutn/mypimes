@@ -710,6 +710,193 @@ def delete_detalle_egreso(id):
 
 # **************************************************************************************************
 
+# Cabecera Reservaciones
+
+@main.route('/get_cabreservaciones', methods=['GET'])
+def get_cabreservaciones():
+    try:
+        a  = model.Model.get_cabecera_reservaciones()
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/get_cabreservacion_byid/<id>', methods=['GET'])
+def get_cabreservacion_byid(id):
+    try:
+        a = model.Model.get_cabecera_reservacion_byid(id)
+        if a[0] is None:
+            return [None]
+        else:
+            return a
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+"""
+@main.route('/create_cabreservacion', methods=['POST'])
+def create_cabreservacion():
+    try:
+        data = request.json
+        a = model.Model.create_cabecera_reservacion(data)
+        if a is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Cabecera reservacion inserted successfully!',
+                'cabecera_reservacion': a[0]
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+"""
+
+@main.route('/update_cabreservacion/<id>', methods=['PUT'])
+def update_cabreservacion(id):
+    try:
+        data = request.json
+        a = model.Model.update_cabecera_reservacion(id, data)
+        if a is None:
+            return jsonify({'message': 'Cabecera reservacion updated failed, Cebecera reservacion not found!'}), 404
+        else:
+            return jsonify({
+                'message': 'Cabecera reservacion updated successfully!',
+                'cabecera_reservacion': a
+            })
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/delete_cabreservacion/<id>', methods=['DELETE'])
+def delete_cabreservacion(id):
+    try:
+        row_affect = model.Model.delete_cabecera_reservacion(id)
+        return jsonify(row_affect)
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+# **************************************************************************************************
+
+
+list_reservaciones = []
+@main.route('/add_detalle_reservaciones', methods = ['GET'])
+def add_detalle_reservaciones():
+    try:
+        data = request.json
+        lista = model.Model.add_detail_reserv(data, list_reservaciones)
+        if lista:
+            return lista
+        else:
+            return [None]
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+list_pagos = []
+@main.route('/add_detalle_pagos', methods = ['GET'])
+def add_detalle_pagos():
+    try:
+        data = request.json
+        lista = model.Model.add_detail_pago(data, list_pagos)
+        if lista:
+            return lista
+        else:
+            return [None]
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+list_egresos = []
+@main.route('/add_detalle_egresos', methods = ['GET'])
+def add_detalle_egresos():
+    try:
+        data = request.json
+        lista = model.Model.add_detail_egreso(data, list_egresos)
+        if lista:
+            return lista
+        else:
+            return [None]
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+def get_values():
+    subtotal = 0
+    iva = 0
+    total = 0
+    if list_reservaciones:
+        for d in list_reservaciones:
+            subtotal+=d['detres_subtotal']
+            iva+=d['detres_iva']
+            total+=d['detres_total']
+    return subtotal, iva, total
+
+def get_valuesPagos():
+    subtotal = 0
+    iva = 0
+    total = 0
+    if list_pagos:
+        for d in list_pagos:
+            subtotal+=d['detpag_subtotal']
+            iva+=d['detpag_iva']
+            total+=d['detpag_total']
+    return subtotal, iva, total
+
+def get_valuesEgresos():
+    subtotal = 0
+    iva = 0
+    total = 0
+    if list_egresos:
+        for d in list_egresos:
+            subtotal+=d['detegre_subtotal']
+            iva+=d['detegre_iva']
+            total+=d['detegre_total']
+    return subtotal, iva, total
+
+@main.route('/generar_reservacion', methods = ['POST'])
+def generar_reservacion():
+    try:
+        data = request.json
+        subtotal, iva, total = get_values()
+        cabres = model.Model.create_cabecera_reservacion(subtotal, iva, total, data)[0]
+        if list_reservaciones:
+            for d in list_reservaciones:
+                d['detres_cabreservacion'] = cabres['id_cabreservacion']
+                model.Model.create_detalle_reservacion(d)
+        return cabres
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/generar_pago_alicuota', methods = ['POST'])
+def generar_pago_alicuota():
+    try:
+        data = request.json
+        subtotal, iva, total = get_valuesPagos()
+        d = model.Model.create_pago_alicuota(subtotal, iva, total, data)[0]
+        if list_pagos:
+            for da in list_pagos:
+                da['pagali_id'] = d.get('pagali_id')
+                model.Model.create_detalle_pago(da)
+        return d
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+@main.route('/generar_egreso', methods = ['POST'])
+def generar_egreso():
+    try:
+        data = request.json
+        subtotal, iva, total = get_valuesEgresos()
+        d = model.Model.create_egreso(subtotal, iva, total, data)[0]
+        if list_egresos:
+            for da in list_egresos:
+                da['egre_id'] = d['egre_id']
+                model.Model.create_detalle_egreso(da)
+        return d
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+# **************************************************************************************************
+
 @main.route('/get_multas', methods=['GET'])
 def get_multas():
     try:
@@ -857,7 +1044,6 @@ def get_tipo_servicios():
 def get_tipo_servicios_byid(id_servicio):
     try:
         tipoServicio_id = model.Model.get_tipo_servicios_byid(id_servicio)
-        print(tipoServicio_id)
         if tipoServicio_id[0] is None:
             return [None]
         else:
@@ -924,7 +1110,6 @@ def get_servicios():
 def get_servicio_byid(id_servicio):
     try:
         Servicios_id = model.Model.get_servicio_byid(id_servicio)
-        print(Servicios_id)
         if Servicios_id[0] is None:
             return [None]
         else:
@@ -1250,7 +1435,7 @@ def get_reunion_byid(reun_idreunion):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-   
+
     
 @main.route('/create_reunion', methods=['POST'])
 def create_reunion():

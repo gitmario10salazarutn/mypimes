@@ -86,12 +86,13 @@ def get_connection():
         return connection
     except Exception as ex:
         raise ex
-
+"""
 
 a = get_connection()
 a = a.cursor()
-a.execute("select * from get_egresos")
+a.execute("select * from detalle_reservaciones dr")
 row = a.fetchall()
 for p in row:
     print(p)
 
+"""

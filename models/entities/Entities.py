@@ -585,10 +585,6 @@ class Entities:
         if detalleegreso:
             doc = detalleegreso[10:35]
             e = detalleegreso[35:]
-            print('Here')
-            print(doc)
-            print(e)
-            print('End')
             return {
                 "detegre_id": detalleegreso[0],
                 "egreso": self.egresosEntity(e),
@@ -637,8 +633,10 @@ class Entities:
         return [self.reservacionesEntity(resv) for resv in reservaciones]
 
     @classmethod
-    def detalleReservacionesEntity(self, detres) -> dict:
-        if detres:
+    def detalleReservacionesEntity(self, d) -> dict:
+        if d:
+            detres = d[:24]
+            cab_resv = d[24:]
             return {
                 "detres_iddetalle": detres[14],
                 "reservacion":{
@@ -659,48 +657,6 @@ class Entities:
                     "resv_descripcion": detres[2],
                     "estado_delete": detres[3]
                 },
-                "secretario":{
-                    "tes_idsecretario": detres[35],
-                    "usuario":{
-                        "user_idusuario": detres[31],
-                        "user_password": detres[34],
-                        "user_estado": detres[32],
-                        "user_fecha": detres[33].strftime('%d/%m/%Y'),
-                        "rol_usuario":{
-                            "rol_idrol": detres[23],
-                            "rol_nombrerol": detres[24]
-                        },
-                        "persona":{
-                            "pers_persona": detres[25],
-                            "pers_email": detres[26],
-                            "pers_nombres": detres[27],
-                            "pers_apellidos": detres[28],
-                            "pers_telefono": detres[29],
-                            "pers_direccion": detres[30]
-                        }
-                    }
-                },
-                "condomino":{
-                    "tes_idcondomino": detres[49],
-                    "usuario":{
-                        "user_idusuario": detres[45],
-                        "user_password": detres[48],
-                        "user_estado": detres[46],
-                        "user_fecha": detres[47].strftime('%d/%m/%Y'),
-                        "rol_usuario":{
-                            "rol_idrol": detres[37],
-                            "rol_nombrerol": detres[38]
-                        },
-                        "persona":{
-                            "pers_persona": detres[39],
-                            "pers_email": detres[40],
-                            "pers_nombres": detres[41],
-                            "pers_apellidos": detres[42],
-                            "pers_telefono": detres[43],
-                            "pers_direccion": detres[44]
-                        }
-                    }
-                },
                 "detres_subtotal": detres[15],
                 "detres_iva": detres[16],
                 "detres_total": detres[17],
@@ -708,7 +664,8 @@ class Entities:
                 "detres_horainicio": detres[19].strftime("%H:%M:%S"),
                 "detres_horafin": detres[20].strftime("%H:%M:%S"),
                 "detres_fecha": detres[21].strftime('%d/%m/%Y'),
-                "estado_delete": detres[22]
+                "estado_delete": detres[22],
+                "cabecera_reservacion": self.cabeceraRecervacionesEntity(cab_resv)
                 }
         else:
             return None
@@ -780,5 +737,80 @@ class Entities:
     @classmethod
     def listPagoAlicuotas(self, pag_alis) -> list:
         return [self.pago_alicuotaEntity(pa) for pa in pag_alis]
+
+    @classmethod
+    def Detalle_Reservaciones(self, data) -> dict:
+        if data:
+            return {
+                "reservacion": data[0],
+                "detres_cabreservacion": data[1],
+                "detres_subtotal": float(f"{data[2]:.2f}"), 
+                "detres_iva": float(f"{data[3]:.2f}"), 
+                "detres_total": float(f"{data[4]:.2f}"), 
+                "detres_cantidad": data[5], 
+                "detres_horainicio": data[6], 
+                "detres_horafin": data[7], 
+                "detres_fecha": data[8], 
+                "estado_delete_detres": data[9]
+            }
+        else:
+            return None
+
+    @classmethod
+    def cabeceraRecervacionesEntity(self, data) -> dict:
+        if data:
+            condomino = data[:14]
+            cab_resv = data[14:22]
+            secretario = data[22:]
+            return {
+                "id_cabreservacion": cab_resv[0],
+                "cabres_secretario": self.secretarioEntity(secretario),
+                "cabres_condomino": self.condominoEntity(condomino),
+                "cabres_subtotal": cab_resv[3],
+                "cabres_iva": cab_resv[4],
+                "cabres_total": cab_resv[5],
+                "cabres_numero": cab_resv[6],
+                "cabres_fecha": cab_resv[7].strftime('%d/%m/%Y'),
+            }
+
+    @classmethod
+    def listCabeceraReservaciones(self, list) -> list:
+        return [self.cabeceraRecervacionesEntity(cr) for cr in list]
+
+    @classmethod
+    def Detalle_Pago(self, data) -> dict:
+        if data:
+            return  {   
+                "pagali_id": data[0],
+                "aliact_id": data[1],
+                "detpag_subtotal": float(f"{data[2]:.2f}"),
+                "detpag_iva": float(f"{data[3]:.2f}"),
+                "detpag_total": float(f"{data[4]:.2f}"),
+                "detpag_fecha": data[5],
+                "detpag_multa": data[6],
+                "estado_delete_detpag": data[7]
+            }
+        else:
+            return None
+
+
+    @classmethod
+    def Detalle_Egreso(self, data) -> dict:
+        if data:
+            return  {
+                "egre_id": data[0],
+                "detegre_numerofactura": data[1],
+                "detegre_valorfactura": data[2],
+                "deteegre_documento": data[3],
+                "detegre_subtotal": float(f"{data[4]:.2f}"),
+                "detegre_iva": float(f"{data[5]:.2f}"),
+                "detegre_total": float(f"{data[6]:.2f}"),
+                "detegre_fecha": data[7],
+                "estado_delete_detegre": data[8]
+            }
+        else:
+            return None
+
+
 
 # (1, 22, 1, '2023-5-2', '000-025', 1897.12, 458.36, 2365.45, False)
