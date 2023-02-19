@@ -1490,13 +1490,14 @@ main.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-mongo = conn.get_connectionMongoDB().db
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @main.route('/upload', methods=['POST'])
 def upload():
+    mongo = conn.get_connectionMongoDB().db
     file = request.files['inputFile']
     doc_descripcion = request.form['doc_descripcion']
     doc_documento = file.filename
@@ -1582,17 +1583,6 @@ def Page_Not_Found(error):
 def index():
     return render_template('index.html')
 
-file_name = "Google Cloud-Preguntas.pdf"
-file_loc = "C:/Users/Mario/Downloads/" + file_name
-down_loc = os.path.join(os.getcwd() + "/downloads/", file_name)
-    
-fs = gridfs.GridFS(mongo, collection="test")
-
-# upload file
-#upload_file(file_loc=file_loc, file_name=file_name, fs=fs)
-# download file
-print(fs)
-download_file(down_loc, mongo, fs, 51)
 
 if __name__ == '__main__':
     main.register_error_handler(404, Page_Not_Found)
