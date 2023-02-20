@@ -867,6 +867,7 @@ def generar_reservacion():
             for d in list_reservaciones:
                 d['detres_cabreservacion'] = cabres['id_cabreservacion']
                 model.Model.create_detalle_reservacion(d)
+        list_reservaciones.clear()
         return cabres
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
