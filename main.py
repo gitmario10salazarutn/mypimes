@@ -14,6 +14,8 @@ from config import config
 from models import Models as model
 from database import connectdb as conn
 import gridfs
+import jwt
+import json
 
 main = Flask(__name__)
 main.secret_key = "mario10salazar"
@@ -282,10 +284,12 @@ def assign_roluser(id_user):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-@main.route('/login/<id_user>/<password>', methods=['GET'])
-def login(id_user, password):
+
+@main.route('/api/users/login', methods=['POST'])
+def login():
     try:
-        user = model.Model.login(id_user, password)
+        data = request.json
+        user = model.Model.login(data)
         if user == 1:
             return jsonify({'message': 'User inactive!'}),404
         elif user == -1:
@@ -293,7 +297,8 @@ def login(id_user, password):
         elif user is None:
             return jsonify({'message': 'Login failed! Please enter a valid username or password'}), 404
         else:
-            return user[0]
+            encoded_jwt = jwt.encode(user[0], "mario10salazar", algorithm="HS256")
+            return json.dumps(encoded_jwt)
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 

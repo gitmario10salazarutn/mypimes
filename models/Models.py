@@ -451,12 +451,12 @@ class Model:
             return Exception(ex)
 
     @classmethod
-    def login(self, username, password):
+    def login(self, data):
         try:
-            user_found = self.get_usuario_byid(username)
+            user_found = self.get_usuario_byid(data['username']) #data['user_idusuario']
             if user_found[0]:
                 user = user_found[0]
-                check_password = check_password_hash(user['user_password'], password)
+                check_password = check_password_hash(user['user_password'], data['password']) #data['password']
                 if check_password and user_found and user['user_estado'] == 0:
                     return user_found
                 elif user['user_estado'] == 1:
