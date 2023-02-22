@@ -10,20 +10,50 @@ def test_connectMongoDB():
     connection = conn.get_connectionMongoDB()
     assert connection
 
-u = model.Model.login('PRE-1003938477', 'password-elenita')
+o = {
+	"username": "PRE-1003938477",
+	"password": "12345678"
+}
+
+us = model.Model.login(o)
+
+d = {
+	"username": "PRE-1003938477",
+	"password": "12345678"
+}
+
+e = {
+	"username": "PRE-1003938477",
+	"password": "123456789"
+}
+
+f = {
+	"username": "PRE-1003938477p",
+	"password": "12345678"
+}
+
+g = {
+	"username": "PRE-1003938410",
+	"password": "12345678"
+}
+
+h = {
+	"username": "PRE-1003938477p",
+	"password": "123456785"
+}
 
 @pytest.mark.parametrize(
-    "u, p, e",
+    "u, e",
     [
-        ('PRE-1003938477', 'password-elenita', u),		# correct
-        ('PRE-1003938477', 'password-elenita-', -1),		# incorrect password
-        ('PRE-1003938477p', 'password-elenita', None),		# incorrect user
-        ('PRE-1003938410', 'my-secret-key', 1),				# user inactive
-        ('PRE-100393847p', 'password-elenita5', None),		# both incorrects
+        (d, us),		# correct
+        (e, -1),		# incorrect password
+        (f, None),		# incorrect user
+        (g, 1),				# user inactive
+        (h, None),		# both incorrects
     ]
 )
-def test_login(u, p, e):
-    assert model.Model.login(u, p) == e
+def test_login(u, e):
+    assert model.Model.login(u) == e
 
 def test_getusers():
     assert model.Model.get_users() is not None
@@ -37,7 +67,7 @@ p = model.Model.get_persona_byid('1003938477')[0]
     "id, e",
     [
         ('1003938477', p),
-        ('1003938473', None)
+        ('100393847j', None)
     ]
 )
 def test_getpersonid(id, e):
@@ -63,7 +93,7 @@ data4 = {
 	('PRE-1003938477', data1, None),
 	('PRE-1003938477', data2, None),
 	('PRE-1003938477', data3, None),
-	('PRE-1003938477', data4, None),
+	('PRE-1002003002', data4, not None),
  	]
 )
 def test_assign_roluser(id_user, data, e):

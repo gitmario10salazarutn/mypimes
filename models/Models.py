@@ -307,6 +307,8 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
+                f = datetime.now()
+                fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
                 cursor.execute("INSERT INTO persona(pers_persona, pers_email, pers_nombres, pers_apellidos, pers_telefono, pers_direccion) values('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
                     data['pers_persona'], data['pers_email'], data['pers_nombres'], data['pers_apellidos'], data['pers_telefono'], data['pers_direccion']))
                 iduser = ''
@@ -318,11 +320,11 @@ class Model:
                     iduser = 'TES-' + data['pers_persona']
                 if int(data['rol_idrol']) == 4:
                     iduser = 'CON-' + data['pers_persona']
-                fecha = datetime.strptime(data['user_fecha'], '%d/%m/%Y')
+                #fecha = datetime.strptime(data['user_fecha'], '%d/%m/%Y')
                 password = data['user_password']
                 hashed = generate_password_hash(password)
                 cursor.execute(
-                    "INSERT INTO user_usuario(user_idusuario, rol_idrol, pers_persona, user_password, user_estado, user_fecha) values('{0}', {1}, '{2}','{3}', '{4}', '{5}')".format(iduser, data['rol_idrol'], data['pers_persona'], hashed, data['user_estado'], fecha))
+                    "INSERT INTO user_usuario(user_idusuario, rol_idrol, pers_persona, user_password, user_estado, user_fecha) values('{0}', {1}, '{2}','{3}', '{4}', '{5}')".format(iduser, data['rol_idrol'], data['pers_persona'], hashed, 0, fecha))
                 if int(data['rol_idrol']) == 1:
                     cursor.execute(
                         "INSERT INTO presidente(user_idusuario) values('{0}')".format(iduser))
@@ -340,7 +342,7 @@ class Model:
                 da = {
                         "user_idusuario": iduser,
                         "user_password": hashed,
-                        "user_estado": data['user_estado'],
+                        "user_estado": 0,
                         "user_email": data['pers_email']
                     }
                 if rows_affects > 0:
