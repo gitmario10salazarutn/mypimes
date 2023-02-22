@@ -791,7 +791,7 @@ def delete_cabreservacion(id):
 
 
 list_reservaciones = []
-@main.route('/add_detalle_reservaciones', methods = ['GET'])
+@main.route('/add_detalle_reservaciones', methods = ['POST'])
 def add_detalle_reservaciones():
     try:
         data = request.json
