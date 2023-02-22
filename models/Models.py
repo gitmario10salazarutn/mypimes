@@ -1722,6 +1722,20 @@ class Model:
             raise Exception(ex)
 
     @classmethod
+    def get_documentosv2(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select doc.doc_iddocumento,td.tipdoc_id,td.tipdoc_nombre,s.sec_idsecretario,doc.doc_descripcion,doc.doc_documento,doc.doc_entidad,doc.doc_recibido,doc.estado_delete_docs from documentos doc JOIN tipo_documento td ON doc.tipo_documento=td.tipdoc_id INNER JOIN  secretario s on doc.sec_idsecretario=s.sec_idsecretario")
+            result = cursor.fetchall()
+            connection.close()
+            documentos = entities.Entities.listDocumentos(result)
+            return documentos
+        except Exception as ex:
+            raise Exception(ex)
+        
+    @classmethod
     def get_documento_byid(self, id):
         try:
             connection = conn.get_connection()

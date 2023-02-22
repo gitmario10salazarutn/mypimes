@@ -197,6 +197,33 @@ class Entities:
 
 
     @classmethod
+    def documentov2Entity(self, documentos) -> dict:
+        if documentos:
+            return {
+            "doc_iddocumento": documentos[0],   
+            "tipo_documento":{
+                "tipdoc_id": documentos[1],
+                "tipdoc_nombre": documentos[2]
+            },
+            "secretario": {
+                "sec_idsecretario": documentos[3]
+               
+            },
+            "doc_descripcion":documentos[4],
+            "doc_documento":documentos[5],
+            "doc_entidad":documentos[6],
+            "doc_recibido":documentos[7],
+            "estado_delete": documentos[8]                
+        }
+        else:
+            return None
+
+    @classmethod
+    def listDocumentosv2(self, documentos) -> list:
+        return [self.documentoEntity(doc) for doc in documentos]
+
+
+    @classmethod
     def estado_documentosEntity(self, estado_documentos) -> dict:
         if estado_documentos:
             return  {

@@ -1320,6 +1320,17 @@ def get_documentos():
             return tps
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
+    
+@main.route('/get_documentosv2', methods=['GET'])
+def get_documentosv2():
+    try:
+        tps = model.Model.get_documentosv2()
+        if tps is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return tps
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
 @main.route('/get_documento_byid/<doc_iddocumento>', methods=['GET'])
