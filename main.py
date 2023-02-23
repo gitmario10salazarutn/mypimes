@@ -100,7 +100,7 @@ def get_personas():
 def get_persona_byid(id_persona):
     try:
         persona = model.Model.get_persona_byid(id_persona)
-        if persona[0] is None:
+        if persona is None:
             return [None]
         else:
             return persona
