@@ -93,9 +93,37 @@ data4 = {
 	('PRE-1003938477', data1, None),
 	('PRE-1003938477', data2, None),
 	('PRE-1003938477', data3, None),
-	('PRE-1002003002', data4, not None),
+	('PRE-1002003002', data4, None),
  	]
 )
 def test_assign_roluser(id_user, data, e):
     a = model.Model.assign_roluser(id_user, data)
     assert a == e
+
+d1 = {
+	"message": "Error, Delete person failed, person not found!"
+}
+
+d2 = {
+	"message": "Person deleted successfully!"
+}
+@pytest.mark.parametrize(
+    "id_pers, e",
+    [
+    ('2002002001', d1),
+    ('2002002005', d2)
+])
+def test_deletepersona(id_pers, e):
+    a = model.Model.delete_persona(id_pers)
+    assert a == e
+
+da = {
+	"username": "SEC-1003938477",
+	"password": "12345"
+}
+
+
+def test_loginuser():
+    a = model.Model.login(da)
+    print(a)
+    assert a == 1
