@@ -136,7 +136,7 @@ class Model:
                 "select p.pers_persona, p.pers_email, p.pers_nombres, p.pers_apellidos, p.pers_telefono, p.pers_direccion from persona p where p.pers_persona= '{0}';".format(id))
             result = cursor.fetchone()
             connection.close()
-            person = [entities.Entities.personaEntity(result)]
+            person = entities.Entities.personaEntity(result)
             return person
         except Exception as ex:
             raise Exception(ex)
