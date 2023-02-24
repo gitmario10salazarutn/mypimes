@@ -1744,11 +1744,57 @@ class Model:
                 "select * from get_documentos doc where doc.doc_iddocumento = {0}".format(id))
             result = cursor.fetchone()
             connection.close()
-            documentos = [entities.Entities.documentoEntity(result)]
+            documentos = entities.Entities.documentoEntity(result)
             return documentos
         except Exception as ex:
             raise Exception(ex)
 
+#Metodos para presidente ----------------------------------------
+    @classmethod
+    def get_documento_byTipoDoc(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_documentos where tipo_documento = {0}".format(id))
+            result = cursor.fetchall()
+            connection.close()
+            documentos = entities.Entities.listDocumentos(result)
+            return documentos
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def get_documento_byEstado(self, estado):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_documentos where estado_delete_docs = '{0}'".format(estado))
+            result = cursor.fetchall()
+            connection.close()
+            documentos = entities.Entities.listDocumentos(result)
+            return documentos
+        except Exception as ex:
+            raise Exception(ex)
+        
+    @classmethod
+    def get_documento_byTipoDocAndEstado(self, id,estado):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from get_documentos where tipo_documento = {0} and estado_delete_docs ='{1}'".format(id,estado))
+            result = cursor.fetchall()
+            connection.close()
+            documentos = entities.Entities.listDocumentos(result)
+            return documentos
+        except Exception as ex:
+            raise Exception(ex)
+
+
+
+      
+#Metodos para presidente ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     @classmethod
     def create_documentos(self, data):

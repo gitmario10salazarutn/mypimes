@@ -1343,6 +1343,44 @@ def get_documento_byid(doc_iddocumento):
             return d
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
+    
+
+# Metodos para preseinte------------------------------------
+
+    
+@main.route('/get_documento_byTipoDoc/<tipo_documento>', methods=['GET'])
+def get_documento_byTipoDoc(tipo_documento):
+    try:
+        tps = model.Model.get_documento_byTipoDoc(tipo_documento)
+        if tps is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return tps
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+    
+@main.route('/get_documento_byEstado/<estado_delete_docs>', methods=['GET'])
+def get_documento_byEstado(estado_delete_docs):
+    try:
+        tps = model.Model.get_documento_byEstado(estado_delete_docs)
+        if tps is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return tps
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+@main.route('/get_documento_byTipoDocAndEstado/<tipo_documento>/<estado_delete_docs>', methods=['GET'])
+def get_documento_byTipoDocAndEstado(tipo_documento,estado_delete_docs):
+    try:
+        tps = model.Model.get_documento_byTipoDocAndEstado(tipo_documento,estado_delete_docs)
+        if tps is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return tps
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+# Metodos para preseinte^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 
