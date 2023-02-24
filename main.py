@@ -322,6 +322,21 @@ def get_detalle_reservaciones():
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
+
+@main.route('/get_detalle_reservaciones_byidsimple/<id_areservacion>', methods=['GET'])
+def get_detalle_reservaciones_byidsimple(id_areservacion):
+    try:
+        ac_id = model.Model.get_detalle_reservaciones_byid_simple(id_areservacion)
+        print(ac_id)
+        if ac_id is None:
+            return [None]
+        else:
+            return ac_id
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+
 @main.route('/get_detalle_reservaciones_byid/<id_areservacion>', methods=['GET'])
 def get_detalle_reservaciones_byid(id_areservacion):
     try:

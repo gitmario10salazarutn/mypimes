@@ -771,6 +771,26 @@ class Entities:
                 "detres_iva": float(f"{data[3]:.2f}"),
                 "detres_total": float(f"{data[4]:.2f}"),
                 "detres_cantidad": data[5],
+                "detres_horainicio": data[6].strftime("%H:%M:%S"),
+                "detres_horafin": data[7].strftime("%H:%M:%S"),
+                "detres_fecha": data[8].strftime('%d/%m%Y'),
+                "estado_delete_detres": data[9],
+                "servicio": data[10]
+            }
+        else:
+            return None
+
+
+    @classmethod
+    def Detalle_Reservaciones1(self, data) -> dict:
+        if data:
+            return {
+                "reservacion": data[0],
+                "detres_cabreservacion": data[1],
+                "detres_subtotal": float(f"{data[2]:.2f}"),
+                "detres_iva": float(f"{data[3]:.2f}"),
+                "detres_total": float(f"{data[4]:.2f}"),
+                "detres_cantidad": data[5],
                 "detres_horainicio": data[6],
                 "detres_horafin": data[7],
                 "detres_fecha": data[8],
@@ -779,6 +799,10 @@ class Entities:
             }
         else:
             return None
+
+    @classmethod
+    def ListDetalle_Reservaciones(self, pag_alis) -> list:
+        return [self.Detalle_Reservaciones(pa) for pa in pag_alis]
 
     @classmethod
     def cabeceraRecervacionesEntity(self, data) -> dict:

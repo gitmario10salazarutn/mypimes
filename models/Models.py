@@ -504,6 +504,21 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
+
+    @classmethod
+    def get_detalle_reservaciones_byid_simple(self, id):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select detres_cabreservacion , detres_cabreservacion , detres_subtotal , detres_iva , detres_total , detres_cantidad , detres_horainicio , detres_horafin , detres_fecha , estado_deletedetres ,  resv_descripcion from get_detalle_reservaciones where id_cabreservacion = {0};".format(id))
+            result = cursor.fetchall()
+            connection.close()
+            a = entities.Entities.ListDetalle_Reservaciones(result)
+            return a
+        except Exception as ex:
+            raise Exception(ex)
+
     @classmethod
     def create_detalle_reservacion(self, data):
         try:
