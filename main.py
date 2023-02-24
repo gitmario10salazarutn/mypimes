@@ -1614,7 +1614,7 @@ def get_pres():
 
 
 @main.route('/get_secretario', methods=['GET'])
-def get_pres():
+def get_sec():
     try:
         tps = model.Model.get_secretario()
         if tps is None:
