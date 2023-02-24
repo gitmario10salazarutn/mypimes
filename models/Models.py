@@ -11,26 +11,27 @@ import json
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
 class Model:
 
     @classmethod
     def userEntity(self, entity) -> dict:
         if entity:
             return {
-            "_id": str(entity['_id']),
-            "user_idusuario": entity['user_idusuario'],
-            "user_password": entity['user_password'],
-            "user_estado": entity['user_estado'],
-            "user_email": entity['user_email']
-        }
+                "_id": str(entity['_id']),
+                "user_idusuario": entity['user_idusuario'],
+                "user_password": entity['user_password'],
+                "user_estado": entity['user_estado'],
+                "user_email": entity['user_email']
+            }
         else:
             return None
-    
+
     @classmethod
     def usersEntity(self, entitys) -> list:
         return [self.userEntity(entity) for entity in entitys]
-    
-    #Example MongoDB
+
+    # Example MongoDB
     @classmethod
     def create_users(self, data):
         try:
@@ -44,10 +45,10 @@ class Model:
                 users = mongo['users']
                 id = users.insert_one(
                     {
-                    'user_idusuario': username,
-                    'user_password': hashed_password,
-                    'user_estado': estado,
-                    'user_email': email
+                        'user_idusuario': username,
+                        'user_password': hashed_password,
+                        'user_estado': estado,
+                        'user_email': email
                     }
                 )
                 response = {
@@ -56,7 +57,7 @@ class Model:
                     'user_password': hashed_password,
                     'user_estado': estado,
                     'user_email': email
-                    }
+                }
                 return response
             else:
                 return None
@@ -73,7 +74,7 @@ class Model:
                 return users
             else:
                 return None
-        except Exception as  e:
+        except Exception as e:
             raise Exception(e)
 
     @classmethod
@@ -82,7 +83,7 @@ class Model:
             mongo = conn.get_connectionMongoDB().db
             collection = mongo['users']
             return [self.userEntity(collection.find_one({'user_idusuario': id}))]
-        except Exception as  e:
+        except Exception as e:
             raise Exception(e)
 
     @classmethod
@@ -91,7 +92,7 @@ class Model:
             mongo = conn.get_connectionMongoDB().db
             collection = mongo['users']
             return [self.userEntity(collection.find_one_and_delete({'user_idusuario': id}))]
-        except Exception as  e:
+        except Exception as e:
             raise Exception(e)
 
     @classmethod
@@ -103,11 +104,11 @@ class Model:
             mongo = conn.get_connectionMongoDB().db
             collection = mongo['users']
             return [self.userEntity(collection.find_one_and_update({'user_idusuario': id_user},
-                        { '$set': {
-                    'user_password': hashed_password,
-                    'user_estado': estado,
-                    'user_email': email
-                    }}))]
+                                                                   {'$set': {
+                                                                       'user_password': hashed_password,
+                                                                       'user_estado': estado,
+                                                                       'user_email': email
+                                                                   }}))]
         except Exception as ex:
             raise Exception(ex)
 
@@ -340,11 +341,11 @@ class Model:
                 rows_affects = cursor.rowcount
                 connection.commit()
                 da = {
-                        "user_idusuario": iduser,
-                        "user_password": hashed,
-                        "user_estado": 0,
-                        "user_email": data['pers_email']
-                    }
+                    "user_idusuario": iduser,
+                    "user_password": hashed,
+                    "user_estado": 0,
+                    "user_email": data['pers_email']
+                }
                 if rows_affects > 0:
                     print(self.create_users(da))
                     user = self.get_usuario_byid(iduser)
@@ -362,15 +363,16 @@ class Model:
                 password = generate_password_hash(data['user_password'])
                 cursor.execute("UPDATE persona SET pers_email = '{0}', pers_nombres = '{1}', pers_apellidos = '{2}', pers_telefono = '{3}', pers_direccion = '{4}' WHERE pers_persona = '{5}'".format(
                     data['pers_email'], data['pers_nombres'], data['pers_apellidos'], data['pers_telefono'], data['pers_direccion'], id_user[4:]))
-                cursor.execute("UPDATE user_usuario SET user_password = '{0}', user_estado = {1} WHERE user_idusuario = '{2}'".format(password, data['user_estado'], id_user))
+                cursor.execute("UPDATE user_usuario SET user_password = '{0}', user_estado = {1} WHERE user_idusuario = '{2}'".format(
+                    password, data['user_estado'], id_user))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 da = {
-                        "user_idusuario": id_user,
-                        "user_password": password,
-                        "user_estado": data['user_estado'],
-                        "user_email": data['pers_email']
-                    }
+                    "user_idusuario": id_user,
+                    "user_password": password,
+                    "user_estado": data['user_estado'],
+                    "user_email": data['pers_email']
+                }
                 if rows_affects > 0:
                     print(self.update_user(id_user, da))
                     user = self.get_usuario_byid(id_user)
@@ -455,10 +457,12 @@ class Model:
     @classmethod
     def login(self, data):
         try:
-            user_found = self.get_usuario_byid(data['username']) #data['user_idusuario']
+            user_found = self.get_usuario_byid(
+                data['username'])  # data['user_idusuario']
             if user_found[0]:
                 user = user_found[0]
-                check_password = check_password_hash(user['user_password'], data['password']) #data['password']
+                check_password = check_password_hash(
+                    user['user_password'], data['password'])  # data['password']
                 if check_password and user_found and user['user_estado'] == 0:
                     return user_found
                 elif user['user_estado'] == 1:
@@ -486,7 +490,6 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-
     @classmethod
     def get_detalle_reservaciones_byid(self, id):
         try:
@@ -501,13 +504,13 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-
     @classmethod
     def create_detalle_reservacion(self, data):
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("insert into detalle_reservaciones (reservacion, detres_subtotal, detres_iva, detres_total, detres_cantidad, detres_horainicio, detres_horafin, detres_fecha, estado_delete_detres, detres_cabreservacion) values({0}, {1}, {2}, {3}, {4}, '{5}', '{6}', '{7}', '{8}', {9}) returning detres_iddetalle;".format(data['reservacion'], data['detres_subtotal'], data['detres_iva'], data['detres_total'], data['detres_cantidad'], data['detres_horainicio'], data['detres_horafin'], data['detres_fecha'], data['estado_delete_detres'], data['detres_cabreservacion']))
+                cursor.execute("insert into detalle_reservaciones (reservacion, detres_subtotal, detres_iva, detres_total, detres_cantidad, detres_horainicio, detres_horafin, detres_fecha, estado_delete_detres, detres_cabreservacion) values({0}, {1}, {2}, {3}, {4}, '{5}', '{6}', '{7}', '{8}', {9}) returning detres_iddetalle;".format(
+                    data['reservacion'], data['detres_subtotal'], data['detres_iva'], data['detres_total'], data['detres_cantidad'], data['detres_horainicio'], data['detres_horafin'], data['detres_fecha'], data['estado_delete_detres'], data['detres_cabreservacion']))
                 rows_affects = cursor.rowcount
                 id = cursor.fetchone()[0]
                 connection.commit()
@@ -524,11 +527,12 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE detalle_reservaciones SET reservacion = {0}, detres_subtotal = {1}, detres_iva = {2}, detres_total = {3}, detres_cantidad = {4}, detres_horainicio = '{5}', detres_horafin = '{6}', detres_fecha = '{7}', estado_delete_detres = '{8}', detres_cabreservacion = {9} WHERE detres_iddetalle = {10}".format(data['reservacion'], data['detres_subtotal'], data['detres_iva'], data['detres_total'], data['detres_cantidad'], data['detres_horainicio'], data['detres_horafin'], data['detres_fecha'], data['estado_delete_detres'], data['detres_cabreservacion'], id))
+                cursor.execute("UPDATE detalle_reservaciones SET reservacion = {0}, detres_subtotal = {1}, detres_iva = {2}, detres_total = {3}, detres_cantidad = {4}, detres_horainicio = '{5}', detres_horafin = '{6}', detres_fecha = '{7}', estado_delete_detres = '{8}', detres_cabreservacion = {9} WHERE detres_iddetalle = {10}".format(
+                    data['reservacion'], data['detres_subtotal'], data['detres_iva'], data['detres_total'], data['detres_cantidad'], data['detres_horainicio'], data['detres_horafin'], data['detres_fecha'], data['estado_delete_detres'], data['detres_cabreservacion'], id))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:
-                    a   = self.get_detalle_reservaciones_byid(id)[0]
+                    a = self.get_detalle_reservaciones_byid(id)[0]
                     return a
                 else:
                     return None
@@ -552,11 +556,9 @@ class Model:
             raise Exception(ex)
 
 
-
 # **************************************************************************************************
 
     # Alicuotas
-
 
     @classmethod
     def get_alicuotas(self):
@@ -609,11 +611,12 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE alicuota SET mult_idmulta = {0}, ali_fecha_actualizacion = '{1}', ali_valor_anterior = {2}, ali_valor_actual = {3}, estado_delete_alicuota = '{4}' WHERE ali_idalicuota = '{5}'".format(data['mult_idmulta'], data['ali_fecha_actualizacion'], data['ali_valor_anterior'], data['ali_valor_actual'], data['estado_delete_alicuota'], id))
+                cursor.execute("UPDATE alicuota SET mult_idmulta = {0}, ali_fecha_actualizacion = '{1}', ali_valor_anterior = {2}, ali_valor_actual = {3}, estado_delete_alicuota = '{4}' WHERE ali_idalicuota = '{5}'".format(
+                    data['mult_idmulta'], data['ali_fecha_actualizacion'], data['ali_valor_anterior'], data['ali_valor_actual'], data['estado_delete_alicuota'], id))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:
-                    a   = self.get_alicuota_byid(id)[0]
+                    a = self.get_alicuota_byid(id)[0]
                     return a
                 else:
                     return {'message': 'Error, Update failed!'}
@@ -640,7 +643,6 @@ class Model:
 # **************************************************************************************************
 
     # Pago Alicuotas
-
 
     @classmethod
     def get_pago_alicuotas(self):
@@ -677,7 +679,8 @@ class Model:
             with connection.cursor() as cursor:
                 f = datetime.now()
                 fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
-                cursor.execute("insert into pago_alicuota (tes_idtesorero, cond_idcondomino, pagali_fecha, pagali_numero, pagali_subtotal, pagali_iva, pagali_total, estado_delete_pagali)  values({0}, {1}, '{2}', '{3}', {4}, {5}, {6}, '{7}') returning pagali_id".format(data['tes_idtesorero'], data['cond_idcondomino'],fecha, data['pagali_numero'], subtotal, iva, total, 'False'))
+                cursor.execute("insert into pago_alicuota (tes_idtesorero, cond_idcondomino, pagali_fecha, pagali_numero, pagali_subtotal, pagali_iva, pagali_total, estado_delete_pagali)  values({0}, {1}, '{2}', '{3}', {4}, {5}, {6}, '{7}') returning pagali_id".format(
+                    data['tes_idtesorero'], data['cond_idcondomino'], fecha, data['pagali_numero'], subtotal, iva, total, 'False'))
                 rows_affects = cursor.rowcount
                 id = cursor.fetchone()[0]
                 connection.commit()
@@ -694,11 +697,12 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE pago_alicuota SET tes_idtesorero = {0}, cond_idcondomino = {1}, pagali_fecha = '{2}', pagali_numero = '{3}', pagali_subtotal = {4}, pagali_iva = {5}, pagali_total = {6}, estado_delete_pagali = '{7}' WHERE pagali_id = '{8}'".format(data['tes_idtesorero'], data['cond_idcondomino'], data['pagali_fecha'], data['pagali_numero'], data['pagali_subtotal'], data['pagali_iva'], data['pagali_total'], data['estado_delete_pagali'], id))
+                cursor.execute("UPDATE pago_alicuota SET tes_idtesorero = {0}, cond_idcondomino = {1}, pagali_fecha = '{2}', pagali_numero = '{3}', pagali_subtotal = {4}, pagali_iva = {5}, pagali_total = {6}, estado_delete_pagali = '{7}' WHERE pagali_id = '{8}'".format(
+                    data['tes_idtesorero'], data['cond_idcondomino'], data['pagali_fecha'], data['pagali_numero'], data['pagali_subtotal'], data['pagali_iva'], data['pagali_total'], data['estado_delete_pagali'], id))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:
-                    a   = self.get_pago_alicuota_byid(id)[0]
+                    a = self.get_pago_alicuota_byid(id)[0]
                     return a
                 else:
                     return None
@@ -725,6 +729,7 @@ class Model:
 # **************************************************************************************************
 
     # Detalle Pago
+
 
     @classmethod
     def get_detalle_pagos(self):
@@ -759,7 +764,8 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("insert into detalle_pago (pagali_id, aliact_id, detpag_subtotal, detpag_iva, detpag_total, detpag_fecha, detpag_multa, estado_delete_detpag)  values({0}, {1}, {2}, {3}, {4}, '{5}', {6}, '{7}') returning detpag_id".format(data['pagali_id'], data['aliact_id'], data['detpag_subtotal'], data['detpag_iva'], data['detpag_total'], data['detpag_fecha'], data['detpag_multa'], data['estado_delete_detpag']))
+                cursor.execute("insert into detalle_pago (pagali_id, aliact_id, detpag_subtotal, detpag_iva, detpag_total, detpag_fecha, detpag_multa, estado_delete_detpag)  values({0}, {1}, {2}, {3}, {4}, '{5}', {6}, '{7}') returning detpag_id".format(
+                    data['pagali_id'], data['aliact_id'], data['detpag_subtotal'], data['detpag_iva'], data['detpag_total'], data['detpag_fecha'], data['detpag_multa'], data['estado_delete_detpag']))
                 rows_affects = cursor.rowcount
                 id = cursor.fetchone()[0]
                 connection.commit()
@@ -776,11 +782,12 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE detalle_pago SET pagali_id = {0}, aliact_id = {1}, detpag_subtotal = {2}, detpag_iva = {3}, detpag_total = {4}, detpag_fecha = '{5}', detpag_multa = {6}, estado_delete_detpag = '{7}' WHERE detpag_id = '{8}'".format(data['pagali_id'], data['aliact_id'], data['detpag_subtotal'], data['detpag_iva'], data['detpag_total'], data['detpag_fecha'], data['detpag_multa'], data['estado_delete_detpag'], id))
+                cursor.execute("UPDATE detalle_pago SET pagali_id = {0}, aliact_id = {1}, detpag_subtotal = {2}, detpag_iva = {3}, detpag_total = {4}, detpag_fecha = '{5}', detpag_multa = {6}, estado_delete_detpag = '{7}' WHERE detpag_id = '{8}'".format(
+                    data['pagali_id'], data['aliact_id'], data['detpag_subtotal'], data['detpag_iva'], data['detpag_total'], data['detpag_fecha'], data['detpag_multa'], data['estado_delete_detpag'], id))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:
-                    a   = self.get_detalle_pago_byid(id)[0]
+                    a = self.get_detalle_pago_byid(id)[0]
                     return a
                 else:
                     return {'message': 'Error, Update failed!'}
@@ -804,11 +811,9 @@ class Model:
             raise Exception(ex)
 
 
-
 # **************************************************************************************************
 
     # Egresos
-
 
     @classmethod
     def get_egresos(self):
@@ -843,7 +848,7 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                
+
                 cursor.execute("select max(cr.egre_id) from egresos cr ;")
                 num = cursor.fetchone()[0]
                 return num
@@ -851,14 +856,15 @@ class Model:
             raise Exception(ex)
 
     @classmethod
-    def create_egreso(self,subtotal, iva, total, data):
+    def create_egreso(self, subtotal, iva, total, data):
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
                 numero = self.getCountEgresos() + 1
                 f = datetime.now()
                 fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
-                cursor.execute("insert into egresos (tes_idtesorero, egre_descripcion, egre_subtotal, egre_iva, egre_total, egre_fecha,egre_numero, estado_delete_egr)  values({0}, '{1}', {2}, {3}, {4}, '{5}', '{6}', '{7}') returning egre_id".format(data['tes_idtesorero'], data['egre_descripcion'], subtotal, iva, total, fecha, numero, 'False'))
+                cursor.execute("insert into egresos (tes_idtesorero, egre_descripcion, egre_subtotal, egre_iva, egre_total, egre_fecha,egre_numero, estado_delete_egr)  values({0}, '{1}', {2}, {3}, {4}, '{5}', '{6}', '{7}') returning egre_id".format(
+                    data['tes_idtesorero'], data['egre_descripcion'], subtotal, iva, total, fecha, numero, 'False'))
                 rows_affects = cursor.rowcount
                 id = cursor.fetchone()[0]
                 connection.commit()
@@ -875,11 +881,12 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE egresos SET tes_idtesorero = {0}, egre_descripcion = '{1}', egre_subtotal = {2}, egre_iva = {3}, egre_total = {4}, egre_fecha = '{5}', egre_numero = '{6}', estado_delete_egr = '{7}' WHERE egre_id = '{8}'".format(data['tes_idtesorero'], data['egre_descripcion'], data['egre_subtotal'], data['egre_iva'], data['egre_total'], data['egre_fecha'], data['egre_numero'], data['estado_delete_egr'], id))
+                cursor.execute("UPDATE egresos SET tes_idtesorero = {0}, egre_descripcion = '{1}', egre_subtotal = {2}, egre_iva = {3}, egre_total = {4}, egre_fecha = '{5}', egre_numero = '{6}', estado_delete_egr = '{7}' WHERE egre_id = '{8}'".format(
+                    data['tes_idtesorero'], data['egre_descripcion'], data['egre_subtotal'], data['egre_iva'], data['egre_total'], data['egre_fecha'], data['egre_numero'], data['estado_delete_egr'], id))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:
-                    a   = self.get_egreso_byid(id)[0]
+                    a = self.get_egreso_byid(id)[0]
                     return a
                 else:
                     return None
@@ -903,11 +910,9 @@ class Model:
             raise Exception(ex)
 
 
-
 # **************************************************************************************************
 
     # Detalle Egresos
-
 
     @classmethod
     def get_detalle_egresos(self):
@@ -942,7 +947,8 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("insert into detalle_egresos (egre_id, detegre_numerofactura, detegre_valorfactura, deteegre_documento, detegre_subtotal, detegre_iva, detegre_total, detegre_fecha, estado_delete_detegre) values({0}, '{1}', {2}, {3}, {4}, {5}, {6}, '{7}', '{8}') returning detegre_id".format(data['egre_id'], data['detegre_numerofactura'], data['detegre_valorfactura'], data['deteegre_documento'], data['detegre_subtotal'], data['detegre_iva'], data['detegre_total'], data['detegre_fecha'], data['estado_delete_detegre']))
+                cursor.execute("insert into detalle_egresos (egre_id, detegre_numerofactura, detegre_valorfactura, deteegre_documento, detegre_subtotal, detegre_iva, detegre_total, detegre_fecha, estado_delete_detegre) values({0}, '{1}', {2}, {3}, {4}, {5}, {6}, '{7}', '{8}') returning detegre_id".format(
+                    data['egre_id'], data['detegre_numerofactura'], data['detegre_valorfactura'], data['deteegre_documento'], data['detegre_subtotal'], data['detegre_iva'], data['detegre_total'], data['detegre_fecha'], data['estado_delete_detegre']))
                 rows_affects = cursor.rowcount
                 id = cursor.fetchone()[0]
                 connection.commit()
@@ -959,11 +965,12 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE detalle_egresos SET egre_id = {0}, detegre_numerofactura = '{1}', detegre_valorfactura = {2}, deteegre_documento = {3}, detegre_subtotal = {4}, detegre_iva = {5}, detegre_total = {6}, detegre_fecha = '{7}', estado_delete_detegre = '{8}' WHERE detegre_id = '{9}'".format(data['egre_id'], data['detegre_numerofactura'], data['detegre_valorfactura'], data['deteegre_documento'], data['detegre_subtotal'], data['detegre_iva'], data['detegre_total'], data['detegre_fecha'], data['estado_delete_detegre'], id))
+                cursor.execute("UPDATE detalle_egresos SET egre_id = {0}, detegre_numerofactura = '{1}', detegre_valorfactura = {2}, deteegre_documento = {3}, detegre_subtotal = {4}, detegre_iva = {5}, detegre_total = {6}, detegre_fecha = '{7}', estado_delete_detegre = '{8}' WHERE detegre_id = '{9}'".format(
+                    data['egre_id'], data['detegre_numerofactura'], data['detegre_valorfactura'], data['deteegre_documento'], data['detegre_subtotal'], data['detegre_iva'], data['detegre_total'], data['detegre_fecha'], data['estado_delete_detegre'], id))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:
-                    a   = self.get_detalle_egreso_byid(id)[0]
+                    a = self.get_detalle_egreso_byid(id)[0]
                     return a
                 else:
                     return None
@@ -990,6 +997,7 @@ class Model:
 # **************************************************************************************************
 
     # Cabecera Reservaciones
+
 
     @classmethod
     def get_cabecera_reservaciones(self):
@@ -1023,22 +1031,24 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                
-                cursor.execute("select max(cr.id_cabreservacion) from cabecera_reservacion cr ;")
+
+                cursor.execute(
+                    "select max(cr.id_cabreservacion) from cabecera_reservacion cr ;")
                 num = cursor.fetchone()[0]
                 return num
         except Exception as ex:
             raise Exception(ex)
 
     @classmethod
-    def create_cabecera_reservacion(self,subtotal, iva, total, data):
+    def create_cabecera_reservacion(self, subtotal, iva, total, data):
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
                 numero = self.getCountReservaciones() + 1
                 f = datetime.now()
                 fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
-                cursor.execute("insert into cabecera_reservacion (cabres_secretario, cabres_condomino, cabres_subtotal, cabres_iva, cabres_total, cabres_numero, cabres_fecha) values({0}, {1}, {2}, {3}, {4}, '{5}', '{6}') returning id_cabreservacion;".format(data['cabres_secretario'], data['cabres_condomino'], subtotal, iva, total, numero, fecha))
+                cursor.execute("insert into cabecera_reservacion (cabres_secretario, cabres_condomino, cabres_subtotal, cabres_iva, cabres_total, cabres_numero, cabres_fecha) values({0}, {1}, {2}, {3}, {4}, '{5}', '{6}') returning id_cabreservacion;".format(
+                    data['cabres_secretario'], data['cabres_condomino'], subtotal, iva, total, numero, fecha))
                 rows_affects = cursor.rowcount
                 id = cursor.fetchone()[0]
                 connection.commit()
@@ -1055,11 +1065,12 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE cabecera_reservacion SET cabres_secretario = {0}, cabres_condomino = {1}, cabres_subtotal = {2}, cabres_iva = {3}, cabres_total = {4}, cabres_numero = '{5}', cabres_fecha = '{6}' WHERE id_cabreservacion = {7}".format(data['cabres_secretario'], data['cabres_condomino'], data['cabres_subtotal'], data['cabres_iva'], data['cabres_total'], data['cabres_numero'], data['cabres_fecha'], id))
+                cursor.execute("UPDATE cabecera_reservacion SET cabres_secretario = {0}, cabres_condomino = {1}, cabres_subtotal = {2}, cabres_iva = {3}, cabres_total = {4}, cabres_numero = '{5}', cabres_fecha = '{6}' WHERE id_cabreservacion = {7}".format(
+                    data['cabres_secretario'], data['cabres_condomino'], data['cabres_subtotal'], data['cabres_iva'], data['cabres_total'], data['cabres_numero'], data['cabres_fecha'], id))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:
-                    a   = self.get_cabecera_reservacion_byid(id)[0]
+                    a = self.get_cabecera_reservacion_byid(id)[0]
                     return a
                 else:
                     return None
@@ -1090,25 +1101,29 @@ class Model:
             if data:
                 dr = []
                 reservacion = self.get_reservaciones_byid(data['reservacion'])
+                # print(reservacion)
                 serv_valor = reservacion[0].get('servicios').get('serv_valor')
                 serv_iva = reservacion[0].get('servicios').get('serv_iva')
                 dr.append(data['reservacion'])
                 dr.append(None)
-                total = data['cantidad'] * serv_valor
+                total = 1 * serv_valor
                 subtotal = total / ((100 + serv_iva)/100)
                 iva = total - subtotal
-                f = datetime.now()
-                fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
+                #f = datetime.now()
+                #fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
                 dr.append(subtotal)
                 dr.append(iva)
                 dr.append(total)
-                dr.append(data['cantidad'])
+                dr.append(1)
                 dr.append(data['hora_inicio'])
                 dr.append(data['hora_fin'])
-                dr.append(fecha)
+                dr.append(data['detres_fecha'])
                 dr.append('False')
-                list_det_reserv.append(entities.Entities.Detalle_Reservaciones(dr))
-                return list_det_reserv
+                dr.append(reservacion[0].get('resv_descripcion'))
+                list_det_reserv.append(
+                    entities.Entities.Detalle_Reservaciones(dr))
+                # entities.Entities.Detalle_Reservaciones(dr))
+                return entities.Entities.Detalle_Reservaciones(dr)
             else:
                 return None
         except Exception as ex:
@@ -1141,7 +1156,6 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-
     @classmethod
     def add_detail_egreso(self, data, list_det_egreso: list) -> list:
         try:
@@ -1168,21 +1182,22 @@ class Model:
 
 # **************************************************************************************************
 
+
     @classmethod
     def get_multas(self):
-            try:
-                connection = conn.get_connection()
-                cursor = connection.cursor()
-                cursor.execute(
-                    "select m.mult_idmulta, m.mult_nombre, m.mult_valor from multa m")
-                result = cursor.fetchall()
-                connection.close()
-                m = entities.Entities.listMultas(result)
-                return m
-            except Exception as ex:
-                raise Exception(ex)
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select m.mult_idmulta, m.mult_nombre, m.mult_valor from multa m")
+            result = cursor.fetchall()
+            connection.close()
+            m = entities.Entities.listMultas(result)
+            return m
+        except Exception as ex:
+            raise Exception(ex)
 
-    #-----------get id
+    # -----------get id
 
     @classmethod
     def get_multas_byid(self, id):
@@ -1198,7 +1213,7 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-    ##-----create 
+    # -----create
 
     @classmethod
     def create_multas(self, data):
@@ -1218,14 +1233,14 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-    ##update
+    # update
     @classmethod
     def update_multas(self, id, data):
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
                 cursor.execute("UPDATE multa SET mult_nombre = '{0}', mult_valor = '{1}' WHERE mult_idmulta = '{2}'".format(
-                  data['mult_nombre'], data['mult_valor'], id))
+                    data['mult_nombre'], data['mult_valor'], id))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:
@@ -1236,8 +1251,8 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
+    # delete
 
-    #delete
     @classmethod
     def delete_multas(self, id):
         try:
@@ -1254,44 +1269,40 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
+    # ----------------------Documentos-----------------------
+    # --------get_tipoDocumentos
 
-
-    ##----------------------Documentos-----------------------
-    ##--------get_tipoDocumentos        
-    
     @classmethod
     def get_tipoDocumentos(self):
-                try:
-                    connection = conn.get_connection()
-                    cursor = connection.cursor()
-                    cursor.execute(
-                        "select td.tipdoc_id,td.tipdoc_nombre from tipo_documento td")
-                    result = cursor.fetchall()
-                    connection.close()
-                    td = entities.Entities.listTipoDocumentos(result)
-                    return td
-                except Exception as ex:
-                    raise Exception(ex)
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select td.tipdoc_id,td.tipdoc_nombre from tipo_documento td")
+            result = cursor.fetchall()
+            connection.close()
+            td = entities.Entities.listTipoDocumentos(result)
+            return td
+        except Exception as ex:
+            raise Exception(ex)
 
+ # ---POR ID GET---
 
- ##---POR ID GET---
-   
     @classmethod
     def get_tipoDocumentos_byid(self, id):
-            try:
-                connection = conn.get_connection()
-                cursor = connection.cursor()
-                cursor.execute(
-                    "select td.tipdoc_id, td.tipdoc_nombre from tipo_documento td where td.tipdoc_id= '{0}';".format(id))
-                result = cursor.fetchone()
-                connection.close()
-                td = [entities.Entities.tipodocumentoEntity(result)]
-                return td
-            except Exception as ex:
-                raise Exception(ex)
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select td.tipdoc_id, td.tipdoc_nombre from tipo_documento td where td.tipdoc_id= '{0}';".format(id))
+            result = cursor.fetchone()
+            connection.close()
+            td = [entities.Entities.tipodocumentoEntity(result)]
+            return td
+        except Exception as ex:
+            raise Exception(ex)
 
-
- ##-----crear tipo de docuemento
+ # -----crear tipo de docuemento
 
     @classmethod
     def create_tipoDocumentos(self, data):
@@ -1328,7 +1339,6 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-
     @classmethod
     def delete_tipoDocumentos(self, id):
         try:
@@ -1345,62 +1355,60 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-  ##-----------------tipo de servicio-----------------------------
-   ###----get 
+  # -----------------tipo de servicio-----------------------------
+   # ----get
     @classmethod
     def get_tipo_servicios(self):
-            try:
-                connection = conn.get_connection()
-                cursor = connection.cursor()
-                cursor.execute(
-                    "select ts.tipserv_id, ts.tipserv_nombre from tipo_servicios ts")
-                result = cursor.fetchall()
-                connection.close()
-                ts = entities.Entities.listTipoServicios(result)
-                return ts
-            except Exception as ex:
-                raise Exception(ex)
-    
-    ###----get id
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select ts.tipserv_id, ts.tipserv_nombre from tipo_servicios ts")
+            result = cursor.fetchall()
+            connection.close()
+            ts = entities.Entities.listTipoServicios(result)
+            return ts
+        except Exception as ex:
+            raise Exception(ex)
+
+    # ----get id
 
     @classmethod
     def get_tipo_servicios_byid(self, id):
-            try:
-                connection = conn.get_connection()
-                cursor = connection.cursor()
-                cursor.execute(
-                    "select ts.tipserv_id, ts.tipserv_nombre from tipo_servicios ts where ts.tipserv_id= {0};".format(id))
-                result = cursor.fetchone()
-                ts = [entities.Entities.tipoServicioEntity(result)]
-                connection.close()
-                return ts
-            except Exception as ex:
-                raise Exception(ex)
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select ts.tipserv_id, ts.tipserv_nombre from tipo_servicios ts where ts.tipserv_id= {0};".format(id))
+            result = cursor.fetchone()
+            ts = [entities.Entities.tipoServicioEntity(result)]
+            connection.close()
+            return ts
+        except Exception as ex:
+            raise Exception(ex)
 
-    
-     ###--- crear  tipo_servicios
+ # --- crear  tipo_servicios
 
     @classmethod
     def create_tipo_servicios(self, data):
-            try:
-                connection = conn.get_connection()
-                with connection.cursor() as cursor:
-                    cursor.execute("INSERT INTO tipo_servicios(tipserv_nombre) values('{0}') RETURNING tipserv_id".format(
-                        data['tipserv_nombre']))
-                    rows_affects = cursor.rowcount
-                    id_ts = cursor.fetchone()[0]
-                    connection.commit()
-                    if rows_affects > 0:
-                        ts = self.get_tipo_servicios_byid(id_ts)
-                        return ts
-                    else:
-                        return {'message': 'Error, Insert failed!'}
-            except Exception as ex:
-                raise Exception(ex)
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("INSERT INTO tipo_servicios(tipserv_nombre) values('{0}') RETURNING tipserv_id".format(
+                    data['tipserv_nombre']))
+                rows_affects = cursor.rowcount
+                id_ts = cursor.fetchone()[0]
+                connection.commit()
+                if rows_affects > 0:
+                    ts = self.get_tipo_servicios_byid(id_ts)
+                    return ts
+                else:
+                    return {'message': 'Error, Insert failed!'}
+        except Exception as ex:
+            raise Exception(ex)
 
+  # --- actualizar  tipo_servicios
 
-  ###--- actualizar  tipo_servicios
- 
     @classmethod
     def update_tipo_servicio(self, id, data):
         try:
@@ -1418,41 +1426,41 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-  ###--- eliminar  tipo_servicios
+  # --- eliminar  tipo_servicios
     @classmethod
     def delete_tipo_servicio(self, id):
-            try:
-                connection = conn.get_connection()
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        "DELETE FROM tipo_servicios WHERE tipserv_id = '{0}'".format(id))
-                    row_affects = cursor.rowcount
-                    connection.commit()
-                    if row_affects > 0:
-                        return {'message': 'Type service deleted successfully!'}
-                    else:
-                        return {'message': 'Error, Delete servicio failed, type service not found!'}
-            except Exception as ex:
-                raise Exception(ex)
+        try:
+            connection = conn.get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM tipo_servicios WHERE tipserv_id = '{0}'".format(id))
+                row_affects = cursor.rowcount
+                connection.commit()
+                if row_affects > 0:
+                    return {'message': 'Type service deleted successfully!'}
+                else:
+                    return {'message': 'Error, Delete servicio failed, type service not found!'}
+        except Exception as ex:
+            raise Exception(ex)
 
-    ##-------------------------------------SERVICIOS----------------------
+    # -------------------------------------SERVICIOS----------------------
 
-     ##-----get Servicios
+ # -----get Servicios
     @classmethod
     def get_servicios(self):
-            try:
-                connection = conn.get_connection()
-                cursor = connection.cursor()
-                cursor.execute(
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
                 "select * from get_servicios")
-                result = cursor.fetchall()
-                connection.close()
-                serv = entities.Entities.listServicios(result)
-                return serv
-            except Exception as ex:
-                raise Exception(ex)
+            result = cursor.fetchall()
+            connection.close()
+            serv = entities.Entities.listServicios(result)
+            return serv
+        except Exception as ex:
+            raise Exception(ex)
 
-    ##-----get servidicos id
+    # -----get servidicos id
 
     @classmethod
     def get_servicio_byid(self, id):
@@ -1468,7 +1476,7 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-    ##--------- create servicios
+    # --------- create servicios
 
     @classmethod
     def create_servicios(self, data):
@@ -1488,7 +1496,7 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-  ##--------- create servicios
+  # --------- create servicios
     @classmethod
     def update_servicios(self, id_servicios, data):
         try:
@@ -1506,8 +1514,7 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-
-    ##-----------delete servicios
+    # -----------delete servicios
 
     @classmethod
     def delete_servicios(self, id):
@@ -1524,9 +1531,9 @@ class Model:
                     return {'message': 'Error, Delete service failed, service not found!'}
         except Exception as ex:
             raise Exception(ex)
-  
-    ##------------------------RESERVACIONES--------------------
-     ## get reservaciones
+
+    # ------------------------RESERVACIONES--------------------
+ # get reservaciones
     @classmethod
     def get_reservaciones(self):
         try:
@@ -1541,7 +1548,7 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-    ## get_id reservaciones
+    # get_id reservaciones
     @classmethod
     def get_reservaciones_byid(self, id):
         try:
@@ -1556,14 +1563,14 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-    ## create reservaciones
+    # create reservaciones
     @classmethod
     def create_reservaciones(self, data):
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO reservaciones(serv_idservicios, resv_fecha, resv_descripcion) values('{0}', '{1}','{2}') RETURNING resv_idreservacion".format(
-                    data['serv_idservicios'], data['resv_fecha'],data['resv_descripcion']))
+                    data['serv_idservicios'], data['resv_fecha'], data['resv_descripcion']))
                 rows_affects = cursor.rowcount
                 id_reservaciones = cursor.fetchone()[0]
                 connection.commit()
@@ -1575,7 +1582,7 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-    #---update reservaciones       
+    # ---update reservaciones
 
     @classmethod
     def update_reservaciones(self, id_rol, data):
@@ -1594,7 +1601,7 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-    ## delete reservaciones
+    # delete reservaciones
 
     @classmethod
     def delete_reservaciones(self, id):
@@ -1611,10 +1618,10 @@ class Model:
                     return {'message': 'Error, Delete booking failed, booking not found!'}
         except Exception as ex:
             raise Exception(ex)
-    
 
-    ##------------------------ALICUOTA ACTUALIZADA--------------------
-     ## get alicuota actualizada
+    # ------------------------ALICUOTA ACTUALIZADA--------------------
+ # get alicuota actualizada
+
     @classmethod
     def get_alicuotaActualizadas(self):
         try:
@@ -1629,8 +1636,8 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
+    # get id alicuota actualizada
 
-    ## get id alicuota actualizada       
     @classmethod
     def get_alicuotaActualizada_byid(self, id):
         try:
@@ -1644,14 +1651,14 @@ class Model:
             return a
         except Exception as ex:
             raise Exception(ex)
-    
 
     @classmethod
     def create_alicuotaActualizada(self, data):
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO alicuota_actualizada(alic_idalicuota, alic_valor, alic_fecha) values({0}, {1}, '{2}') RETURNING alic_id".format(data['alic_idalicuota'], data['alic_valor'], data['alic_fecha']))
+                cursor.execute("INSERT INTO alicuota_actualizada(alic_idalicuota, alic_valor, alic_fecha) values({0}, {1}, '{2}') RETURNING alic_id".format(
+                    data['alic_idalicuota'], data['alic_valor'], data['alic_fecha']))
                 rows_affects = cursor.rowcount
                 id_ac = cursor.fetchone()[0]
                 connection.commit()
@@ -1663,7 +1670,7 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-    #---update ralicuotaac
+    # ---update ralicuotaac
 
     @classmethod
     def update_alicuotaActualizada(self, id_rol, data):
@@ -1681,9 +1688,9 @@ class Model:
                     return {'message': 'Error, Update failed!'}
         except Exception as ex:
             raise Exception(ex)
-        
-    ##---delete alicuotaac
-    
+
+    # ---delete alicuotaac
+
     @classmethod
     def delete_alicuotaActualizada(self, id):
         try:
@@ -1700,13 +1707,12 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-
-
     # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-    #SECRETARIO
+    # SECRETARIO
 
     # Documento
+
     @classmethod
     def get_documentos(self):
         try:
@@ -1734,7 +1740,7 @@ class Model:
             return documentos
         except Exception as ex:
             raise Exception(ex)
-        
+
     @classmethod
     def get_documento_byid(self, id):
         try:
@@ -1749,7 +1755,7 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-#Metodos para presidente ----------------------------------------
+# Metodos para presidente ----------------------------------------
     @classmethod
     def get_documento_byTipoDoc(self, id):
         try:
@@ -1763,6 +1769,7 @@ class Model:
             return documentos
         except Exception as ex:
             raise Exception(ex)
+
     @classmethod
     def get_documento_byEstado(self, estado):
         try:
@@ -1776,14 +1783,14 @@ class Model:
             return documentos
         except Exception as ex:
             raise Exception(ex)
-        
+
     @classmethod
-    def get_documento_byTipoDocAndEstado(self, id,estado):
+    def get_documento_byTipoDocAndEstado(self, id, estado):
         try:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select * from get_documentos where tipo_documento = {0} and estado_delete_docs ='{1}'".format(id,estado))
+                "select * from get_documentos where tipo_documento = {0} and estado_delete_docs ='{1}'".format(id, estado))
             result = cursor.fetchall()
             connection.close()
             documentos = entities.Entities.listDocumentos(result)
@@ -1792,9 +1799,8 @@ class Model:
             raise Exception(ex)
 
 
+# Metodos para presidente ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-      
-#Metodos para presidente ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     @classmethod
     def create_documentos(self, data):
@@ -1802,7 +1808,7 @@ class Model:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO documentos(tipo_documento,sec_idsecretario,doc_descripcion,doc_documento,doc_entidad,doc_recibido) values('{0}', '{1}','{2}', '{3}','{4}','{5}') RETURNING doc_iddocumento".format(
-                    data['tipdoc_id'], data['sec_idsecretario'],data['doc_descripcion'],data['doc_documento'],data['doc_entidad'],data['doc_recibido']))
+                    data['tipdoc_id'], data['sec_idsecretario'], data['doc_descripcion'], data['doc_documento'], data['doc_entidad'], data['doc_recibido']))
                 rows_affects = cursor.rowcount
                 id_d = cursor.fetchone()[0]
                 connection.commit()
@@ -1819,7 +1825,8 @@ class Model:
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE documentos SET tipo_documento = '{0}',sec_idsecretario='{1}',doc_descripcion='{2}',doc_documento='{3}',doc_entidad='{4}',doc_recibido='{5}' WHERE doc_iddocumento = '{6}'".format(data['tipdoc_id'], data['sec_idsecretario'], data['doc_descripcion'], data['doc_documento'], data['doc_entidad'], data['doc_recibido'], doc_iddocumento))
+                cursor.execute("UPDATE documentos SET tipo_documento = '{0}',sec_idsecretario='{1}',doc_descripcion='{2}',doc_documento='{3}',doc_entidad='{4}',doc_recibido='{5}' WHERE doc_iddocumento = '{6}'".format(
+                    data['tipdoc_id'], data['sec_idsecretario'], data['doc_descripcion'], data['doc_documento'], data['doc_entidad'], data['doc_recibido'], doc_iddocumento))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:
@@ -1829,8 +1836,6 @@ class Model:
                     return {'message': 'Error, Update failed!'}
         except Exception as ex:
             raise Exception(ex)
-
-
 
     @classmethod
     def delete_documento(self, id):
@@ -1848,7 +1853,7 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-     ##estado_documentos   
+ # estado_documentos
     @classmethod
     def get_estado_documentoTODO(self):
         try:
@@ -1862,7 +1867,7 @@ class Model:
             return eds
         except Exception as ex:
             raise Exception(ex)
-        
+
     @classmethod
     def get_estado_documentoTRUE(self):
         try:
@@ -1875,30 +1880,28 @@ class Model:
             return eds
         except Exception as ex:
             raise Exception(ex)
-    @classmethod    
+
+    @classmethod
     def get_estado_documentoFALSE(self):
         try:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                          "select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed where ed.aprobado_presidente=0")
+                "select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed where ed.aprobado_presidente=0")
             result = cursor.fetchall()
             connection.close()
             eds = entities.Entities.listEstadoDocumentos(result)
             return eds
         except Exception as ex:
             raise Exception(ex)
-    
-    
 
-    
     @classmethod
     def get_estado_documento_byid(self, id):
         try:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                         "select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed where ed.estdoc_id={0};".format(id))
+                "select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed where ed.estdoc_id={0};".format(id))
             result = cursor.fetchone()
             connection.close()
             td = [entities.Entities.estado_documentosEntity(result)]
@@ -1912,7 +1915,7 @@ class Model:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO estado_documentos(doc_iddocumento,aprobado_presidente,aprobado_entidad,fecha_aprovadopresidente,fecha_aprobadoentidad) values('{0}','{1}','{2}','{3}','{4}') returning estdoc_id".format(
-                    data['doc_iddocumento'],data['aprobado_presidente'],data['aprobado_entidad'],data['fecha_aprovadopresidente'],data['fecha_aprobadoentidad']))
+                    data['doc_iddocumento'], data['aprobado_presidente'], data['aprobado_entidad'], data['fecha_aprovadopresidente'], data['fecha_aprobadoentidad']))
                 rows_affects = cursor.rowcount
                 id_ed = cursor.fetchone()[0]
                 connection.commit()
@@ -1925,7 +1928,8 @@ class Model:
             raise Exception(ex)
 
 
-##reunion  
+# reunion
+
     @classmethod
     def get_reunion(self):
         try:
@@ -1954,14 +1958,13 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-  
     @classmethod
     def create_reunion(self, data):
         try:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO reunion(pres_idpresidente,mult_idmulta,reun_fecha,reun_hora,reun_descripcion,reun_quorum,reun_estado,secretario) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}') RETURNING reun_idreunion".format(
-                   data['reun_idreunion'], data['pres_idpresidente'],data[' mult_idmulta'],data['reun_fecha'],data['reun_hora'],data['reun_descripcion'],data['reun_quorum'],data['reun_estado'],data['secretario'] ))
+                    data['reun_idreunion'], data['pres_idpresidente'], data[' mult_idmulta'], data['reun_fecha'], data['reun_hora'], data['reun_descripcion'], data['reun_quorum'], data['reun_estado'], data['secretario']))
                 rows_affects = cursor.rowcount
                 id_td = cursor.fetchone()[0]
                 connection.commit()
@@ -1979,7 +1982,7 @@ class Model:
             connection = conn.get_connection()
             with connection.cursor() as cursor:
                 cursor.execute("UPDATE reunion SET pres_idpresidente = '{0}',mult_idmulta = '{1}',reun_fecha = '{2}',reun_hora = '{3}',reun_descripcion = '{4}',reun_quorum = '{5}',reun_estado = '{6}',secretario = '{7}', WHERE reun_idreunion = '{8}'".format(
-                    data['pres_idpresidente'],data[' mult_idmulta'],data['reun_fecha'],data['reun_hora'],data['reun_descripcion'],data['reun_quorum'],data['reun_estado'],data['secretario'],id_reunion))
+                    data['pres_idpresidente'], data[' mult_idmulta'], data['reun_fecha'], data['reun_hora'], data['reun_descripcion'], data['reun_quorum'], data['reun_estado'], data['secretario'], id_reunion))
                 rows_affects = cursor.rowcount
                 connection.commit()
                 if rows_affects > 0:

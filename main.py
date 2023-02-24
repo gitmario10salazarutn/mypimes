@@ -4,6 +4,7 @@ Created on Tue Oct 11 22:55:25 2022
 
 @author: Mario
 """
+import pathlib
 from flask_cors import CORS
 from flask import Flask, jsonify, request, render_template, flash, redirect, url_for
 from flask_mongoengine import MongoEngine
@@ -21,6 +22,7 @@ main = Flask(__name__)
 main.secret_key = "mario10salazar"
 CORS(main)
 
+
 @main.route('/get_user_byid/<id_user>', methods=['GET'])
 def get_user_byid(id_user):
     try:
@@ -31,6 +33,7 @@ def get_user_byid(id_user):
             return user
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
 
 @main.route('/get_users', methods=['GET'])
 def get_users():
@@ -43,7 +46,8 @@ def get_users():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-@main.route('/create_users', methods = ['POST'])
+
+@main.route('/create_users', methods=['POST'])
 def create_users():
     try:
         data = request.json
@@ -57,6 +61,7 @@ def create_users():
             })
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
 
 @main.route('/delete_user/<id_user>', methods=['DELETE'])
 def delete_user(id_user):
@@ -83,6 +88,7 @@ def update_user(id_usuario):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 # Person
+
 
 @main.route('/get_personas', methods=['GET'])
 def get_personas():
@@ -291,13 +297,14 @@ def login():
         data = request.json
         user = model.Model.login(data)
         if user == 1:
-            return jsonify({'message': 'User inactive!'}),404
+            return jsonify({'message': 'User inactive!'}), 404
         elif user == -1:
             return jsonify({'message': 'Login failed! Please enter a valid username or password'}), 404
         elif user is None:
             return jsonify({'message': 'Login failed! Please enter a valid username or password'}), 404
         else:
-            encoded_jwt = jwt.encode(user[0], "mario10salazar", algorithm="HS256")
+            encoded_jwt = jwt.encode(
+                user[0], "mario10salazar", algorithm="HS256")
             return json.dumps(encoded_jwt)
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
@@ -368,8 +375,6 @@ def delete_detalle_reservacion(id):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-
-
 # **************************************************************************************************
 
 # Alicuotas
@@ -377,7 +382,7 @@ def delete_detalle_reservacion(id):
 @main.route('/get_alicuotas', methods=['GET'])
 def get_alicuotas():
     try:
-        a  = model.Model.get_alicuotas()
+        a = model.Model.get_alicuotas()
         if a is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
@@ -446,7 +451,7 @@ def delete_alicuota(id):
 @main.route('/get_pago_alicuotas', methods=['GET'])
 def get_pago_alicuotas():
     try:
-        a  = model.Model.get_pago_alicuotas()
+        a = model.Model.get_pago_alicuotas()
         if a is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
@@ -508,7 +513,6 @@ def delete_pago_alicuota(id):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-
 # **************************************************************************************************
 
 # Detalle Pago
@@ -516,7 +520,7 @@ def delete_pago_alicuota(id):
 @main.route('/get_detalle_pagos', methods=['GET'])
 def get_detalle_pagos():
     try:
-        a  = model.Model.get_detalle_pagos()
+        a = model.Model.get_detalle_pagos()
         if a is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
@@ -578,7 +582,6 @@ def delete_detalle_pago(id):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-
 # **************************************************************************************************
 
 # Egresos
@@ -586,7 +589,7 @@ def delete_detalle_pago(id):
 @main.route('/get_egresos', methods=['GET'])
 def get_egresos():
     try:
-        a  = model.Model.get_egresos()
+        a = model.Model.get_egresos()
         if a is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
@@ -648,8 +651,6 @@ def delete_egreso(id):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-
-
 # **************************************************************************************************
 
 # Egresos
@@ -657,7 +658,7 @@ def delete_egreso(id):
 @main.route('/get_detalle_egresos', methods=['GET'])
 def get_detalle_egresos():
     try:
-        a  = model.Model.get_detalle_egresos()
+        a = model.Model.get_detalle_egresos()
         if a is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
@@ -726,7 +727,7 @@ def delete_detalle_egreso(id):
 @main.route('/get_cabreservaciones', methods=['GET'])
 def get_cabreservaciones():
     try:
-        a  = model.Model.get_cabecera_reservaciones()
+        a = model.Model.get_cabecera_reservaciones()
         if a is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
@@ -746,6 +747,7 @@ def get_cabreservacion_byid(id):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
+
 """
 @main.route('/create_cabreservacion', methods=['POST'])
 def create_cabreservacion():
@@ -762,6 +764,7 @@ def create_cabreservacion():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 """
+
 
 @main.route('/update_cabreservacion/<id>', methods=['PUT'])
 def update_cabreservacion(id):
@@ -791,7 +794,9 @@ def delete_cabreservacion(id):
 
 
 list_reservaciones = []
-@main.route('/add_detalle_reservaciones', methods = ['POST'])
+
+
+@main.route('/add_detalle_reservaciones', methods=['POST'])
 def add_detalle_reservaciones():
     try:
         data = request.json
@@ -803,8 +808,11 @@ def add_detalle_reservaciones():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
+
 list_pagos = []
-@main.route('/add_detalle_pagos', methods = ['GET'])
+
+
+@main.route('/add_detalle_pagos', methods=['GET'])
 def add_detalle_pagos():
     try:
         data = request.json
@@ -816,8 +824,11 @@ def add_detalle_pagos():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
+
 list_egresos = []
-@main.route('/add_detalle_egresos', methods = ['GET'])
+
+
+@main.route('/add_detalle_egresos', methods=['GET'])
 def add_detalle_egresos():
     try:
         data = request.json
@@ -829,16 +840,30 @@ def add_detalle_egresos():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
+
 def get_values():
     subtotal = 0
     iva = 0
     total = 0
     if list_reservaciones:
         for d in list_reservaciones:
-            subtotal+=d['detres_subtotal']
-            iva+=d['detres_iva']
-            total+=d['detres_total']
+            subtotal += d['detres_subtotal']
+            iva += d['detres_iva']
+            total += d['detres_total']
     return subtotal, iva, total
+
+
+def get_values_02(lista):
+    subtotal = 0
+    iva = 0
+    total = 0
+    if lista:
+        for d in lista:
+            subtotal += d['detres_subtotal']
+            iva += d['detres_iva']
+            total += d['detres_total']
+    return subtotal, iva, total
+
 
 def get_valuesPagos():
     subtotal = 0
@@ -846,10 +871,11 @@ def get_valuesPagos():
     total = 0
     if list_pagos:
         for d in list_pagos:
-            subtotal+=d['detpag_subtotal']
-            iva+=d['detpag_iva']
-            total+=d['detpag_total']
+            subtotal += d['detpag_subtotal']
+            iva += d['detpag_iva']
+            total += d['detpag_total']
     return subtotal, iva, total
+
 
 def get_valuesEgresos():
     subtotal = 0
@@ -857,28 +883,32 @@ def get_valuesEgresos():
     total = 0
     if list_egresos:
         for d in list_egresos:
-            subtotal+=d['detegre_subtotal']
-            iva+=d['detegre_iva']
-            total+=d['detegre_total']
+            subtotal += d['detegre_subtotal']
+            iva += d['detegre_iva']
+            total += d['detegre_total']
     return subtotal, iva, total
 
-@main.route('/generar_reservacion', methods = ['POST'])
+
+@main.route('/generar_reservacion', methods=['POST'])
 def generar_reservacion():
     try:
         data = request.json
-        subtotal, iva, total = get_values()
-        cabres = model.Model.create_cabecera_reservacion(subtotal, iva, total, data)[0]
-        if list_reservaciones:
-            for d in list_reservaciones:
+        lista = data['detalle']
+        print(lista)
+        subtotal, iva, total = get_values_02(lista)
+        cabres = model.Model.create_cabecera_reservacion(
+            subtotal, iva, total, data)[0]
+        if lista:
+            for d in lista:
                 d['detres_cabreservacion'] = cabres['id_cabreservacion']
                 model.Model.create_detalle_reservacion(d)
-        list_reservaciones.clear()
+        lista.clear()
         return cabres
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-@main.route('/generar_pago_alicuota', methods = ['POST'])
+@main.route('/generar_pago_alicuota', methods=['POST'])
 def generar_pago_alicuota():
     try:
         data = request.json
@@ -892,7 +922,8 @@ def generar_pago_alicuota():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-@main.route('/generar_egreso', methods = ['POST'])
+
+@main.route('/generar_egreso', methods=['POST'])
 def generar_egreso():
     try:
         data = request.json
@@ -921,7 +952,7 @@ def get_multas():
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-##-----get id 
+# -----get id
 
 @main.route('/get_multas_byid/<id_multa>', methods=['GET'])
 def get_multas_byid(id_multa):
@@ -934,7 +965,9 @@ def get_multas_byid(id_multa):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-##----create
+# ----create
+
+
 @main.route('/create_multas', methods=['POST'])
 def create_multas():
     try:
@@ -947,7 +980,8 @@ def create_multas():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-##-----update
+# -----update
+
 
 @main.route('/update_multas/<id_multas>', methods=['PUT'])
 def update_multas(id_multas):
@@ -962,7 +996,7 @@ def update_multas(id_multas):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-##-------Delete
+# -------Delete
 @main.route('/delete_multas/<id_multas>', methods=['DELETE'])
 def delete_multas(id_multas):
     try:
@@ -972,8 +1006,7 @@ def delete_multas(id_multas):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-
-##---------------tipo documentos---------
+# ---------------tipo documentos---------
 @main.route('/get_tipoDocumentos', methods=['GET'])
 def get_tipoDocumentos():
     try:
@@ -1011,7 +1044,6 @@ def create_tipoDocumentos():
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-
 @main.route('/update_tipoDocumentos/<id_tido>', methods=['PUT'])
 def update_tipoDocumentos(id_tido):
     try:
@@ -1025,7 +1057,6 @@ def update_tipoDocumentos(id_tido):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-
 @main.route('/delete_tipoDocumentos/<id_tido>', methods=['DELETE'])
 def delete_tipoDocumentos(id_tido):
     try:
@@ -1035,9 +1066,8 @@ def delete_tipoDocumentos(id_tido):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-
-##------------tipo de servicio-------------
-    ##---get 
+# ------------tipo de servicio-------------
+    # ---get
 @main.route('/get_tipo_servicios', methods=['GET'])
 def get_tipo_servicios():
     try:
@@ -1049,8 +1079,8 @@ def get_tipo_servicios():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-    
-    ##---get id 
+    # ---get id
+
 
 @main.route('/get_tipo_servicios_byid/<id_servicio>', methods=['GET'])
 def get_tipo_servicios_byid(id_servicio):
@@ -1063,7 +1093,9 @@ def get_tipo_servicios_byid(id_servicio):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-   ##---crear tipo de servicio
+   # ---crear tipo de servicio
+
+
 @main.route('/create_tipo_servicios', methods=['POST'])
 def create_tipo_servicios():
     try:
@@ -1076,18 +1108,20 @@ def create_tipo_servicios():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-##-----actualizar tipo servicio
+# -----actualizar tipo servicio
+
+
 @main.route('/update_tipo_servicio/<id_tise>', methods=['PUT'])
 def update_tipo_servicio(id_tise):
-        try:
-            data = request.json
-            tise = model.Model.update_tipo_servicio(id_tise, data)
-            if tise is None:
-                return jsonify({'message': 'Tipo de servicio updated failed, Tipo de servicio not found!'}), 404
-            else:
-                return tise
-        except Exception as ex:
-            return jsonify({'message': 'Error {0}'.format(ex)}), 500
+    try:
+        data = request.json
+        tise = model.Model.update_tipo_servicio(id_tise, data)
+        if tise is None:
+            return jsonify({'message': 'Tipo de servicio updated failed, Tipo de servicio not found!'}), 404
+        else:
+            return tise
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
 @main.route('/delete_tipo_servicio/<id_rotise>', methods=['DELETE'])
@@ -1099,9 +1133,9 @@ def delete_tipo_servicio(id_rotise):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-##-------------------SERVICIOS-----------------
+# -------------------SERVICIOS-----------------
 
-#--get
+# --get
 
 @main.route('/get_servicios', methods=['GET'])
 def get_servicios():
@@ -1115,7 +1149,7 @@ def get_servicios():
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-##-------get id 
+# -------get id
 
 
 @main.route('/get_servicio_byid/<id_servicio>', methods=['GET'])
@@ -1129,7 +1163,9 @@ def get_servicio_byid(id_servicio):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-   ##---crear  servicios
+   # ---crear  servicios
+
+
 @main.route('/create_servicios', methods=['POST'])
 def create_servicios():
     try:
@@ -1143,7 +1179,7 @@ def create_servicios():
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-##update servicios
+# update servicios
 
 @main.route('/update_servicios/<id_servicios>', methods=['PUT'])
 def update_servicios(id_servicios):
@@ -1160,7 +1196,8 @@ def update_servicios(id_servicios):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-##-----------delete servicios
+# -----------delete servicios
+
 
 @main.route('/delete_servicios/<id_servicios>', methods=['DELETE'])
 def delete_servicios(id_servicios):
@@ -1171,8 +1208,8 @@ def delete_servicios(id_servicios):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-###-----------------------RESERVACIONES---------------
-#---get reseraciones
+# -----------------------RESERVACIONES---------------
+# ---get reseraciones
 
 @main.route('/get_reservaciones', methods=['GET'])
 def get_reservaciones():
@@ -1185,7 +1222,8 @@ def get_reservaciones():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-#-----get id reservaciones
+# -----get id reservaciones
+
 
 @main.route('/get_reservaciones_byid/<id_reservaciones>', methods=['GET'])
 def get_reservaciones_byid(id_reservaciones):
@@ -1198,8 +1236,9 @@ def get_reservaciones_byid(id_reservaciones):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
+   # ---crear reservaciones
 
-   ##---crear reservaciones
+
 @main.route('/create_reservaciones', methods=['POST'])
 def create_reservaciones():
     try:
@@ -1212,13 +1251,15 @@ def create_reservaciones():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-##update reservaciones
+# update reservaciones
+
 
 @main.route('/update_reservaciones/<id_reservaciones>', methods=['PUT'])
 def update_reservaciones(id_reservaciones):
     try:
         data = request.json
-        reservaciones = model.Model.update_reservaciones(id_reservaciones, data)
+        reservaciones = model.Model.update_reservaciones(
+            id_reservaciones, data)
         if reservaciones is None:
             return jsonify({'message': 'Bookings updated failed, Bookings not found!'}), 404
         else:
@@ -1230,7 +1271,7 @@ def update_reservaciones(id_reservaciones):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-##delete_reservaciones
+# delete_reservaciones
 @main.route('/delete_reservaciones/<id_reservaciones>', methods=['DELETE'])
 def delete_reservaciones(id_reservaciones):
     try:
@@ -1240,8 +1281,8 @@ def delete_reservaciones(id_reservaciones):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-##---------------------------ALICUOTA ACTUALIZADA----------------------
-## get 
+# ---------------------------ALICUOTA ACTUALIZADA----------------------
+# get
 @main.route('/get_alicuotaActualizadas', methods=['GET'])
 def get_alicuotaActualizadas():
     try:
@@ -1253,7 +1294,9 @@ def get_alicuotaActualizadas():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-## get id
+# get id
+
+
 @main.route('/get_alicuotaActualizada_byid/<id_alicuotaac>', methods=['GET'])
 def get_alicuotaActualizada_byid(id_alicuotaac):
     try:
@@ -1265,7 +1308,9 @@ def get_alicuotaActualizada_byid(id_alicuotaac):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-## create alicuota_actualizada
+# create alicuota_actualizada
+
+
 @main.route('/create_alicuotaActualizada', methods=['POST'])
 def create_alicuotaActualizada():
     try:
@@ -1279,7 +1324,7 @@ def create_alicuotaActualizada():
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-##update alicuota actualizada
+# update alicuota actualizada
 @main.route('/update_alicuotaActualizada/<id_alicuotaac>', methods=['PUT'])
 def update_alicuotaActualizada(id_alicuotaac):
     try:
@@ -1295,9 +1340,8 @@ def update_alicuotaActualizada(id_alicuotaac):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
+    # ---delete alicuotaac
 
-
-    ##---delete alicuotaac
 
 @main.route('/delete_alicuotaActualizada/<id_ac>', methods=['DELETE'])
 def delete_alicuotaActualizada(id_ac):
@@ -1320,7 +1364,8 @@ def get_documentos():
             return tps
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
-    
+
+
 @main.route('/get_documentosv2', methods=['GET'])
 def get_documentosv2():
     try:
@@ -1343,11 +1388,11 @@ def get_documento_byid(doc_iddocumento):
             return d
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
-    
+
 
 # Metodos para preseinte------------------------------------
 
-    
+
 @main.route('/get_documento_byTipoDoc/<tipo_documento>', methods=['GET'])
 def get_documento_byTipoDoc(tipo_documento):
     try:
@@ -1358,7 +1403,8 @@ def get_documento_byTipoDoc(tipo_documento):
             return tps
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
-    
+
+
 @main.route('/get_documento_byEstado/<estado_delete_docs>', methods=['GET'])
 def get_documento_byEstado(estado_delete_docs):
     try:
@@ -1370,10 +1416,12 @@ def get_documento_byEstado(estado_delete_docs):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
+
 @main.route('/get_documento_byTipoDocAndEstado/<tipo_documento>/<estado_delete_docs>', methods=['GET'])
-def get_documento_byTipoDocAndEstado(tipo_documento,estado_delete_docs):
+def get_documento_byTipoDocAndEstado(tipo_documento, estado_delete_docs):
     try:
-        tps = model.Model.get_documento_byTipoDocAndEstado(tipo_documento,estado_delete_docs)
+        tps = model.Model.get_documento_byTipoDocAndEstado(
+            tipo_documento, estado_delete_docs)
         if tps is None:
             return jsonify({'message': 'Data not found!'}), 404
         else:
@@ -1381,7 +1429,6 @@ def get_documento_byTipoDocAndEstado(tipo_documento,estado_delete_docs):
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 # Metodos para preseinte^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 
 
 @main.route('/create_documentos', methods=['POST'])
@@ -1422,8 +1469,7 @@ def delete_documento(doc_iddocumento):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-
-##estado_documento
+# estado_documento
 @main.route('/get_estado_documentoTODO', methods=['GET'])
 def get_estado_documentoTODO():
     try:
@@ -1433,9 +1479,9 @@ def get_estado_documentoTODO():
         else:
             return tps
     except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 
-    
-    
+        return jsonify({'message': 'Error {0}'.format(ex)}),
+
+
 @main.route('/get_estado_documentoTRUE', methods=['GET'])
 def get_estado_documentoTRUE():
     try:
@@ -1447,6 +1493,7 @@ def get_estado_documentoTRUE():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
+
 @main.route('/get_estado_documentoFALSE', methods=['GET'])
 def get_estado_documentoFALSE():
     try:
@@ -1457,7 +1504,6 @@ def get_estado_documentoFALSE():
             return tps
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
 
 
 @main.route('/create_estado_documento', methods=['POST'])
@@ -1472,7 +1518,9 @@ def create_estado_documento():
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
-##reunion
+# reunion
+
+
 @main.route('/get_reuniones', methods=['GET'])
 def get_reuniones():
     try:
@@ -1482,8 +1530,9 @@ def get_reuniones():
         else:
             return tps
     except Exception as ex:
-        return jsonify({'message': 'Error {0}'.format(ex)}), 
-    
+        return jsonify({'message': 'Error {0}'.format(ex)}),
+
+
 @main.route('/get_reunion_byid/<reun_idreunion>', methods=['GET'])
 def get_reunion_byid(reun_idreunion):
     try:
@@ -1496,8 +1545,6 @@ def get_reunion_byid(reun_idreunion):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
-
-    
 @main.route('/create_reunion', methods=['POST'])
 def create_reunion():
     try:
@@ -1509,7 +1556,6 @@ def create_reunion():
             return c_td[0]
     except Exception as ex:
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
-
 
 
 @main.route('/update_reunion/<id_reunion>', methods=['PUT'])
@@ -1538,7 +1584,6 @@ def delete_reunion(id_reunion):
 
 
 # **************************************************************************************************
-import pathlib
 UPLOAD_FOLDER = 'docs/'
 main.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 main.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -1546,9 +1591,9 @@ main.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 
-
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @main.route('/upload', methods=['POST'])
 def upload():
@@ -1561,15 +1606,15 @@ def upload():
     estado_delete = request.form['estado_delete']
     sec_idsecretario = request.form['sec_idsecretario']
     tipdoc_id = request.form['tipdoc_id']
-    data = 	{
-		"doc_descripcion": doc_descripcion,
-		"doc_documento": file.filename,
-		"doc_entidad": doc_entidad,
-		"doc_recibido": doc_recibido,
-		"estado_delete": estado_delete,
-		"sec_idsecretario": sec_idsecretario,
-		"tipdoc_id": tipdoc_id
-	}
+    data = {
+        "doc_descripcion": doc_descripcion,
+        "doc_documento": file.filename,
+        "doc_entidad": doc_entidad,
+        "doc_recibido": doc_recibido,
+        "estado_delete": estado_delete,
+        "sec_idsecretario": sec_idsecretario,
+        "tipdoc_id": tipdoc_id
+    }
     doc = model.Model.create_documentos(data)[0]
     id_doc = doc.get('doc_iddocumento')
     filename = secure_filename(file.filename)
@@ -1578,40 +1623,42 @@ def upload():
         file_loc = os.path.join(main.config['UPLOAD_FOLDER'], filename)
         docs = mongo['test.files']
         fs = gridfs.GridFS(mongo, collection="test")
-        upload_file(file_loc=file_loc, file_name=file.filename, fs=fs, doc_descripcion = doc_descripcion,
-                                        doc_documento = file.filename,
-                                        doc_entidad = doc_entidad,
-                                        doc_recibido = doc_recibido,
-                                        estado_delete = estado_delete,
-                                        sec_idsecretario = sec_idsecretario,
-                                        tipdoc_id = tipdoc_id,
-                                        doc_iddocumento = id_doc)
-        flash('File successfully uploaded ' + file.filename + ' to the database!')
+        upload_file(file_loc=file_loc, file_name=file.filename, fs=fs, doc_descripcion=doc_descripcion,
+                    doc_documento=file.filename,
+                    doc_entidad=doc_entidad,
+                    doc_recibido=doc_recibido,
+                    estado_delete=estado_delete,
+                    sec_idsecretario=sec_idsecretario,
+                    tipdoc_id=tipdoc_id,
+                    doc_iddocumento=id_doc)
+        flash('File successfully uploaded ' +
+              file.filename + ' to the database!')
         return redirect('/')
     else:
-        flash('Invalid Uplaod only txt, pdf, png, jpg, jpeg, gif') 
+        flash('Invalid Uplaod only txt, pdf, png, jpg, jpeg, gif')
     return redirect('/')
 
+
 def upload_file(file_loc, file_name, fs, doc_descripcion,
-                                        doc_documento,
-                                        doc_entidad,
-                                        doc_recibido,
-                                        estado_delete,
-                                        sec_idsecretario,
-                                        tipdoc_id, doc_iddocumento):
+                doc_documento,
+                doc_entidad,
+                doc_recibido,
+                estado_delete,
+                sec_idsecretario,
+                tipdoc_id, doc_iddocumento):
     """upload file to mongodb"""
     print(file_loc)
     with open(file_loc, 'rb') as file_data:
         data = file_data.read()
     # put file into mongodb
-    fs.put(data, filename=file_name, doc_descripcion = doc_descripcion,
-                                        doc_documento = doc_documento,
-                                        doc_entidad = doc_entidad,
-                                        doc_recibido = doc_recibido,
-                                        estado_delete = estado_delete,
-                                        sec_idsecretario = sec_idsecretario,
-                                        tipdoc_id = tipdoc_id,
-                                        doc_iddocumento = doc_iddocumento)
+    fs.put(data, filename=file_name, doc_descripcion=doc_descripcion,
+           doc_documento=doc_documento,
+           doc_entidad=doc_entidad,
+           doc_recibido=doc_recibido,
+           estado_delete=estado_delete,
+           sec_idsecretario=sec_idsecretario,
+           tipdoc_id=tipdoc_id,
+           doc_iddocumento=doc_iddocumento)
     print("Upload Complete")
 
 
@@ -1619,16 +1666,17 @@ def download_file(download_loc, db, fs, id_doc):
     """download file from mongodb"""
     data = db.test.files.find_one({"doc_iddocumento": id_doc})
     print(data)
-    
+
     fs_id = data['_id']
     out_data = fs.get(fs_id).read()
 
     with open(download_loc, 'wb') as output:
         output.write(out_data)
-    
+
     print("Download Completed!")
 
 # **************************************************************************************************
+
 
 def Page_Not_Found(error):
     return '<h1>Page Not Found</h1>', 404
@@ -1641,5 +1689,4 @@ def index():
 
 if __name__ == '__main__':
     main.register_error_handler(404, Page_Not_Found)
-    main.run(debug = True, host = "0.0.0.0")
-
+    main.run(debug=True, host="0.0.0.0")
