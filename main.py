@@ -1598,6 +1598,35 @@ def delete_reunion(id_reunion):
         return jsonify({'message': 'Error {0}'.format(ex)}), 500
 
 
+
+
+
+@main.route('/get_presidente', methods=['GET'])
+def get_pres():
+    try:
+        tps = model.Model.get_presidente()
+        if tps is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return tps
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+@main.route('/get_secretario', methods=['GET'])
+def get_pres():
+    try:
+        tps = model.Model.get_secretario()
+        if tps is None:
+            return jsonify({'message': 'Data not found!'}), 404
+        else:
+            return tps
+    except Exception as ex:
+        return jsonify({'message': 'Error {0}'.format(ex)}), 500
+
+
+
+
 # **************************************************************************************************
 UPLOAD_FOLDER = 'docs/'
 main.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER

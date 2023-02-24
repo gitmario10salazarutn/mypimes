@@ -1875,7 +1875,7 @@ class Model:
             connection = conn.get_connection()
             cursor = connection.cursor()
             cursor.execute(
-                "select ed.estdoc_id, ed.doc_iddocumento,ed.aprobado_presidente,ed.aprobado_entidad,ed.fecha_aprovadopresidente, ed.fecha_aprobadoentidad from estado_documentos ed")
+                "select * from get_estado_documentos ed")
             result = cursor.fetchall()
             connection.close()
             eds = entities.Entities.listEstadoDocumentos(result)
@@ -2021,5 +2021,33 @@ class Model:
                     return {'message': 'Type Document deleted successfully!'}
                 else:
                     return {'message': 'Error, Delete type Document failed, Type Document not found!'}
+        except Exception as ex:
+            raise Exception(ex)
+
+
+    @classmethod
+    def get_secretario(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from secretario r")
+            result = cursor.fetchall()
+            connection.close()
+            reuniones = entities.Entities.listSecretarios(result)
+            return reuniones
+        except Exception as ex:
+            raise Exception(ex)
+    @classmethod
+    def get_presidente(self):
+        try:
+            connection = conn.get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "select * from presidente p")
+            result = cursor.fetchall()
+            connection.close()
+            reuniones = entities.Entities.listPresidentes(result)
+            return reuniones
         except Exception as ex:
             raise Exception(ex)
