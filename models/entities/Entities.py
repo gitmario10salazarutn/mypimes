@@ -762,7 +762,7 @@ class Entities:
         return [self.pago_alicuotaEntity(pa) for pa in pag_alis]
 
     @classmethod
-    def Detalle_Reservaciones(self, data) -> dict:
+    def Detalle_Reservaciones1(self, data) -> dict:
         if data:
             return {
                 "reservacion": data[0],
@@ -782,7 +782,7 @@ class Entities:
 
 
     @classmethod
-    def Detalle_Reservaciones1(self, data) -> dict:
+    def Detalle_Reservaciones(self, data) -> dict:
         if data:
             return {
                 "reservacion": data[0],
@@ -802,7 +802,7 @@ class Entities:
 
     @classmethod
     def ListDetalle_Reservaciones(self, pag_alis) -> list:
-        return [self.Detalle_Reservaciones(pa) for pa in pag_alis]
+        return [self.Detalle_Reservaciones1(pa) for pa in pag_alis]
 
     @classmethod
     def cabeceraRecervacionesEntity(self, data) -> dict:
