@@ -104,11 +104,11 @@ class Model:
             mongo = conn.get_connectionMongoDB().db
             collection = mongo['users']
             return [self.userEntity(collection.find_one_and_update({'user_idusuario': id_user},
-                                                                   {'$set': {
-                                                                       'user_password': hashed_password,
-                                                                       'user_estado': estado,
-                                                                       'user_email': email
-                                                                   }}))]
+                                                                {'$set': {
+                                                                    'user_password': hashed_password,
+                                                                    'user_estado': estado,
+                                                                    'user_email': email
+                                                                }}))]
         except Exception as ex:
             raise Exception(ex)
 

@@ -75,10 +75,10 @@ def get_connectionMongoDB():
 def get_connection():
     try:
         connection = connect_postgresql(
-            config('HOST_NAME_HEROKU'),
-            config('DATABASE_HEROKU'),
-            config('USER_NAME_HEROKU'),
-            config('PASSWORD_HEROKU'),
+            config('HOST_NAME_KLEVER'),
+            config('DATABASE_KLEVER'),
+            config('USER_NAME_KLEVER'),
+            config('PASSWORD_KLEVER'),
             #config('HOST_NAME_LOCAL'),
             #config('DATABASE_LOCAL'),
             #config('USER_NAME_LOCAL'),
