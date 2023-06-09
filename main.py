@@ -7,7 +7,6 @@ Created on Tue Oct 11 22:55:25 2022
 import pathlib
 from flask_cors import CORS
 from flask import Flask, jsonify, request, render_template, flash, redirect, url_for
-from flask_mongoengine import MongoEngine
 from werkzeug.utils import secure_filename
 import os
 import urllib.request
