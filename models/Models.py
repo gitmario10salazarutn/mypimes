@@ -104,11 +104,11 @@ class Model:
             mongo = conn.get_connectionMongoDB().db
             collection = mongo['users']
             return [self.userEntity(collection.find_one_and_update({'user_idusuario': id_user},
-                                                                {'$set': {
+                                                                   {'$set': {
                                                                     'user_password': hashed_password,
                                                                     'user_estado': estado,
                                                                     'user_email': email
-                                                                }}))]
+                                                                    }}))]
         except Exception as ex:
             raise Exception(ex)
 
@@ -321,11 +321,12 @@ class Model:
                     iduser = 'TES-' + data['pers_persona']
                 if int(data['rol_idrol']) == 4:
                     iduser = 'CON-' + data['pers_persona']
-                #fecha = datetime.strptime(data['user_fecha'], '%d/%m/%Y')
+                # fecha = datetime.strptime(data['user_fecha'], '%d/%m/%Y')
                 password = data['user_password']
                 hashed = generate_password_hash(password)
                 cursor.execute(
                     "INSERT INTO user_usuario(user_idusuario, rol_idrol, pers_persona, user_password, user_estado, user_fecha) values('{0}', {1}, '{2}','{3}', '{4}', '{5}')".format(iduser, data['rol_idrol'], data['pers_persona'], hashed, 0, fecha))
+                self.create_users(data)
                 if int(data['rol_idrol']) == 1:
                     cursor.execute(
                         "INSERT INTO presidente(user_idusuario) values('{0}')".format(iduser))
@@ -503,7 +504,6 @@ class Model:
             return a
         except Exception as ex:
             raise Exception(ex)
-
 
     @classmethod
     def get_detalle_reservaciones_byid_simple(self, id):
@@ -1124,8 +1124,8 @@ class Model:
                 total = 1 * serv_valor
                 subtotal = total / ((100 + serv_iva)/100)
                 iva = total - subtotal
-                #f = datetime.now()
-                #fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
+                # f = datetime.now()
+                # fecha = "{0}/{1}/{2}".format(f.month, f.day, f.year)
                 dr.append(subtotal)
                 dr.append(iva)
                 dr.append(total)
@@ -2024,7 +2024,6 @@ class Model:
         except Exception as ex:
             raise Exception(ex)
 
-
     @classmethod
     def get_secretario(self):
         try:
@@ -2038,6 +2037,7 @@ class Model:
             return reuniones
         except Exception as ex:
             raise Exception(ex)
+
     @classmethod
     def get_presidente(self):
         try:
