@@ -326,7 +326,7 @@ class Model:
                 hashed = generate_password_hash(password)
                 cursor.execute(
                     "INSERT INTO user_usuario(user_idusuario, rol_idrol, pers_persona, user_password, user_estado, user_fecha) values('{0}', {1}, '{2}','{3}', '{4}', '{5}')".format(iduser, data['rol_idrol'], data['pers_persona'], hashed, 0, fecha))
-                self.create_users(data)
+                # self.create_users(data)
                 if int(data['rol_idrol']) == 1:
                     cursor.execute(
                         "INSERT INTO presidente(user_idusuario) values('{0}')".format(iduser))
@@ -455,6 +455,7 @@ class Model:
         except Exception as ex:
             return Exception(ex)
 
+#My Method
     @classmethod
     def login(self, data):
         try:
